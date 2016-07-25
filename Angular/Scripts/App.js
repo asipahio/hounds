@@ -35,27 +35,27 @@ HoundsApp.run(["$rootScope", function ($rootScope) {
         return [
 			{
 			    url: "/Leagues",
-			    config: { templateUrl: "/Angular/Templates/Leagues.html", controller: "LeaguesCtrl" }
+			    config: { templateUrl: "Angular/Templates/Leagues.html", controller: "LeaguesCtrl" }
 
 			},
             {
                 url: "/Weeks/:SeasonID/:LeagueID",
-                config: { templateUrl: "/Angular/Templates/Weeks.html", controller: "WeeksCtrl" }
+                config: { templateUrl: "Angular/Templates/Weeks.html", controller: "WeeksCtrl" }
 
             },
             {
                 url: "/Stats/:SeasonID/:LeagueID/:WeekID",
-                config: { templateUrl: "/Angular/Templates/Stats.html", controller: "StatsCtrl" }
+                config: { templateUrl: "Angular/Templates/Stats.html", controller: "StatsCtrl" }
 
             },
             {
                 url: "/Update",
-                config: { templateUrl: "/Angular/Templates/Update.html", controller: "UpdateCtrl" }
+                config: { templateUrl: "Angular/Templates/Update.html", controller: "UpdateCtrl" }
 
             },
             {
                 url: "/UpdateWeeks",
-                config: { templateUrl: "/Angular/Templates/UpdateWeeks.html", controller: "UpdateWeeksCtrl" }
+                config: { templateUrl: "Angular/Templates/UpdateWeeks.html", controller: "UpdateWeeksCtrl" }
 
             }
         ]
