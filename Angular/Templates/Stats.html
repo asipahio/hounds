@@ -1,0 +1,77 @@
+﻿<div class="panel panel-default">
+    <div class="panel-heading">Stats</div>
+    <table class="table table-bordered table-condensed table-striped" data-ng-hide="isTotalStats">
+        <tbody>
+            <tr>
+                <th>OGB</th>
+                <td>{{ Week.OGB.Name }}</td>
+                <th>DGB</th>
+                <td>{{ Week.DGB.Name }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <uib-accordion>
+        <li uib-accordion-group data-ng-class="{ 'list-group-item-warning' : !athlete.IsRegularPlayer}" ng-repeat="athlete in Athletes">
+            <uib-accordion-heading>
+                {{athlete.Name}} <span class="text-warning" data-ng-show="athlete.isDNP">DNP</span>
+            </uib-accordion-heading>
+            <span class="text-danger" data-ng-show="!athlete.stats">Did not play</span>
+            <table class="table table-condensed table-striped table-bordered table-hover" data-ng-show="athlete.stats">
+                <tr>
+                    <th colspan="2">Defensive</th>
+                <tr />
+                <tr>
+                    <td>Deflections</td>
+                    <td>{{ athlete.stats.Deflections }}</td>
+                </tr>
+                <tr>
+                    <td>Interceptions</td>
+                    <td>{{ athlete.stats.Interceptions }}</td>
+                </tr>
+                <tr>
+                    <td>Defensive TD</td>
+                    <td>{{ athlete.stats.DefensiveTD }}</td>
+                </tr>
+                <tr>
+                    <td>Flag Pulls</td>
+                    <td>{{ athlete.stats.FlagPulls }}</td>
+                </tr>
+                <tr>
+                    <td>Sacks</td>
+                    <td>{{ athlete.stats.Sacks }}</td>
+                </tr>
+                <tr>
+                    <td>Safety</td>
+                    <td>{{ athlete.stats.Safety }}</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Offensive</th>
+                </tr>
+                <tr>
+                    <td>Rec/Ru TD</td>
+                    <td>{{ athlete.stats.Touchdowns }}</td>
+                </tr>
+                <tr>
+                    <td>Passing TD</td>
+                    <td>{{ athlete.stats.PassingTD }}</td>
+                </tr>
+                <tr>
+                    <td>Rec/Ru XP</td>
+                    <td>{{ athlete.stats.ExtraPoints }}</td>
+                </tr>
+                <tr>
+                    <td>Passing XP</td>
+                    <td>{{ athlete.stats.PassingXP }}</td>
+                </tr>
+                <tr>
+                    <td>Receptions</td>
+                    <td>{{ athlete.stats.Receptions }}</td>
+                </tr>
+                <tr>
+                    <td>Passing INT</td>
+                    <td>{{ athlete.stats.PassingINT }}</td>
+                </tr>
+            </table>
+        </li>
+    </uib-accordion>
+</div>

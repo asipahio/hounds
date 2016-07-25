@@ -1,0 +1,70 @@
+﻿<form class="form-horizontal" data-ng-submit="UpdateStat(LeagueID, Week, Athlete)">
+    <div class="form-group">
+        <h3>Add/Update Stats</h3>
+    </div>
+    <div class="form-group">
+        <label>League</label>
+        <select class="form-control" data-ng-model="LeagueID" data-ng-options="league.ID as league.Name for league in Leagues" data-ng-change="GetWeeks(LeagueID)"></select>
+    </div>
+    <div class="form-group">
+        <label>Week</label>
+        <select class="form-control" data-ng-model="Week" data-ng-options="week as week.Week for week in Weeks" data-ng-change="GetAthletes(Week)"></select>
+    </div>
+    <div class="form-group">
+        <label>Athletes</label>
+        <select class="form-control" data-ng-model="Athlete" data-ng-options="athlete as athlete.Name for athlete in Athletes"></select>
+    </div>
+    <div class="form-group"><h4>Defensive</h4></div>
+    <div class="form-group">
+        <label>Deflections</label>
+        <input type="number" data-ng-model="Athlete.stats.Deflections" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Interceptions</label>
+        <input type="number" data-ng-model="Athlete.stats.Interceptions" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Defensive TD</label>
+        <input type="number" data-ng-model="Athlete.stats.DefensiveTD" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Flag Pulls</label>
+        <input type="number" data-ng-model="Athlete.stats.FlagPulls" class="form-control" step="0.5"/>
+    </div>
+    <div class="form-group">
+        <label>Sacks</label>
+        <input type="number" data-ng-model="Athlete.stats.Sacks" class="form-control" step="0.5" />
+    </div>
+    <div class="form-group">
+        <label>Safeties</label>
+        <input type="number" data-ng-model="Athlete.stats.Safety" class="form-control" step="0.5" />
+    </div>
+    <div class="form-group"><h4>Offensive</h4></div>
+    <div class="form-group">
+        <label>Rec/Ru TD</label>
+        <input type="number" data-ng-model="Athlete.stats.Touchdowns" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Passing TD</label>
+        <input type="number" data-ng-model="Athlete.stats.PassingTD" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Rec/Ru XP</label>
+        <input type="number" data-ng-model="Athlete.stats.ExtraPoints" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Passing XP</label>
+        <input type="number" data-ng-model="Athlete.stats.PassingXP" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Receptions</label>
+        <input type="number" data-ng-model="Athlete.stats.Receptions" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Passing INT</label>
+        <input type="number" data-ng-model="Athlete.stats.PassingINT" class="form-control" />
+    </div>
+    <div class="form-group">
+        <input type="submit" class="btn btn-success btn-block" value="Add/Update" />
+    </div>
+</form>

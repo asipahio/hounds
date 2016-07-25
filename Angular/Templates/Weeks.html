@@ -1,0 +1,8 @@
+﻿<div class="panel panel-default">
+    <div class="panel-heading">Weeks</div>
+    <div class="list-group">
+        <a class="list-group-item" data-ng-repeat="week in Weeks | orderBy:'Week':true" data-ng-href="#/Stats/{{SeasonID}}/{{LeagueID}}/{{week.ID}}">{{ week.Week }}</a>
+    </div>
+</div>
+
+<ng-include src="'/Angular/Templates/Stats.html'"></ng-include>

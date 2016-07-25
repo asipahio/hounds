@@ -1,0 +1,11 @@
+﻿body { padding-top: 55px; }
+
+.panel uib-accordion > .list-group, .panel>.panel-collapse>.list-group {
+    margin-bottom: 0;
+}
+.panel uib-accordion >.list-group,.panel>.panel-collapse>.list-group{margin-bottom:0}
+    .panel uib-accordion > .list-group .list-group-item, .panel > .panel-collapse > .list-group .list-group-item { border-width: 1px 0; border-radius: 0; }
+    .panel uib-accordion > .list-group:first-child .list-group-item:first-child, .panel > .panel-collapse > .list-group:first-child .list-group-item:first-child { border-top: 0; border-top-left-radius: 3px; border-top-right-radius: 3px; }
+    .panel uib-accordion > .list-group:last-child .list-group-item:last-child, .panel > .panel-collapse > .list-group:last-child .list-group-item:last-child { border-bottom: 0; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px; }
+.panel > .panel-heading + .panel-collapse uib-accordion > .list-group .list-group-item:first-child { border-top-left-radius: 0; border-top-right-radius: 0; }
+.panel > .table { border-bottom: 1px solid #ddd; }
