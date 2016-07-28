@@ -82,8 +82,8 @@ HoundsControllers.controller('StatsCtrl', ['$scope', "$routeParams", "StatsFacto
         WeeksFactory.GetWeekDetails(function (data) {
             $scope.$apply(function () {
                 $scope.Week = data;
-                $scope.Week.OGB = $scope.Athletes[$scope.Week.OGB];
-                $scope.Week.DGB = $scope.Athletes[$scope.Week.DGB];
+                $scope.Week.OGB = _.findWhere($scope.Athletes, { "ID": $scope.Week.OGB });
+                $scope.Week.DGB = _.findWhere($scope.Athletes, { "ID": $scope.Week.DGB });
             });
         }, $routeParams.WeekID);
     });

@@ -1,4 +1,3 @@
-c:\users\ali.sipahi\documents\visual studio 2015\Projects\Hounds\Hounds\bin\Hounds.dll.config
 c:\users\ali.sipahi\documents\visual studio 2015\Projects\Hounds\Hounds\bin\Hounds.dll
 c:\users\ali.sipahi\documents\visual studio 2015\Projects\Hounds\Hounds\bin\Hounds.pdb
 c:\users\ali.sipahi\documents\visual studio 2015\Projects\Hounds\Hounds\obj\Debug\Hounds.csprojResolveAssemblyReference.cache
