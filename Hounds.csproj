@@ -838,7 +838,6 @@
     <Content Include="Scripts\jquery-1.9.1.min.js" />
     <Content Include="Scripts\ui-bootstrap-tpls-2.0.0.min.js" />
     <Content Include="Scripts\underscore-min.js" />
-    <Content Include="web.config" />
     <Content Include="Scripts\version.json" />
   </ItemGroup>
   <ItemGroup>
@@ -846,12 +845,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Scripts\jquery-1.9.1.min.map" />
-    <None Include="web.Debug.config">
-      <DependentUpon>web.config</DependentUpon>
-    </None>
-    <None Include="web.Release.config">
-      <DependentUpon>web.config</DependentUpon>
-    </None>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
