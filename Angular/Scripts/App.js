@@ -2,7 +2,11 @@
     "ngRoute",
     "ui.bootstrap",
     "HoundsControllers",
-    "firebase"
+    "firebase",
+    'ngTouch',
+    'ui.grid',
+    'ui.grid.pinning',
+    'ui.grid.grouping'
     //"angular-loading-bar",
 ]);
 
