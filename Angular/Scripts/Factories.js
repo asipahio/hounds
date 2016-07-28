@@ -94,7 +94,17 @@
                 callback(_.where(data, { "LeagueID": LeagueID, "WeekID": WeekID }));
             });
         },
-        GetSeasonStats: function (callback, SeasonID, LeagueID) {
+        GetSeasonStats: function (callback, SeasonID) {
+            firebase.database().ref('/Stats/').orderByChild("SeasonID").equalTo(SeasonID).once('value').then(function (snapshot) {
+                var data = [];
+                snapshot.forEach(function (childSnapshot) {
+                    var obj = _.extend({ "ID": childSnapshot.getKey() }, childSnapshot.val());
+                    data.push(obj);
+                });
+                callback(_.groupBy(data, 'AthleteID'));
+            });
+        },
+        GetSeasonStatsPerLeague: function (callback, SeasonID, LeagueID) {
             firebase.database().ref('/Stats/').orderByChild("SeasonID").equalTo(SeasonID).once('value').then(function (snapshot) {
                 var data = [];
                 snapshot.forEach(function (childSnapshot) {
