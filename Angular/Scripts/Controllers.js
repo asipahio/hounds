@@ -7,25 +7,27 @@ HoundsControllers.controller('LeaguesCtrl', ['$scope', "$timeout", "LeagueFactor
         });
     });
 
+    var rowtpl = '<div ng-class="{ \'isSubPlayer\':!row.entity.IsRegularPlayer }"><div ng-repeat="(colRenderIndex, col) in colContainer.renderedColumns track by col.colDef.name" class="ui-grid-cell" ng-class="{ \'ui-grid-row-header-cell\': col.isRowHeader }" ui-grid-cell></div></div>';
     $scope.gridOptions = {
+        rowTemplate: rowtpl,
         category: [
             { name: 'Defense', displayName: 'Defense', visible: true, showCatName: false },
             { name: 'Offense', displayName: 'Offense', visible: true, showCatName: false }
         ],
         columnDefs: [
             { name: 'Name', width: 75, pinnedLeft: true },
-            { name: 'stats.Deflections', displayName: "Defl.", width: 100, category: "Defense" },
-            { name: 'stats.Interceptions', displayName: "Int", width: 100, category: "Defense" },
-            { name: 'stats.DefensiveTD', displayName: "Def. TD", width: 100, category: "Defense" },
-            { name: 'stats.FlagPulls', displayName: "Flag Pulls", width: 100, category: "Defense" },
-            { name: 'stats.Sacks', displayName: "Sacks", width: 100, category: "Defense" },
-            { name: 'stats.Safety', displayName: "Safeties", width: 100, category: "Defense" },
-            { name: 'stats.Touchdowns', displayName: "TD", width: 100, category: "Offense" },
-            { name: 'stats.PassingTD', displayName: "Pass. TD", width: 100, category: "Offense" },
-            { name: 'stats.ExtraPoints', displayName: "XP", width: 100, category: "Offense" },
-            { name: 'stats.PassingXP', displayName: "Pass. XP", width: 100, category: "Offense" },
-            { name: 'stats.Receptions', displayName: "Rec.", width: 100, category: "Offense" },
-            { name: 'stats.PassingINT', displayName: "Pass. INT", width: 100, category: "Offense" }
+            { name: 'stats.Deflections', displayName: "Defl.", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Deflections == $scope.MaxDeflections ? "maxColValue" : "" } },
+            { name: 'stats.Interceptions', displayName: "Int", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Interceptions == $scope.MaxInterceptions ? "maxColValue" : "" } },
+            { name: 'stats.DefensiveTD', displayName: "Def. TD", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.DefensiveTD == $scope.MaxDefensiveTD ? "maxColValue" : "" } },
+            { name: 'stats.FlagPulls', displayName: "Flag Pulls", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.FlagPulls == $scope.MaxFlagPulls ? "maxColValue" : "" } },
+            { name: 'stats.Sacks', displayName: "Sacks", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Sacks == $scope.MaxSacks ? "maxColValue" : "" } },
+            { name: 'stats.Safety', displayName: "Safeties", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Safety == $scope.MaxSafety ? "maxColValue" : "" } },
+            { name: 'stats.Touchdowns', displayName: "TD", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Touchdowns == $scope.MaxTouchdowns ? "maxColValue" : "" } },
+            { name: 'stats.PassingTD', displayName: "Pass. TD", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingTD == $scope.MaxPassingTD ? "maxColValue" : "" } },
+            { name: 'stats.ExtraPoints', displayName: "XP", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.ExtraPoints == $scope.MaxExtraPoints ? "maxColValue" : "" } },
+            { name: 'stats.PassingXP', displayName: "Pass. XP", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingXP == $scope.MaxPassingXP ? "maxColValue" : "" } },
+            { name: 'stats.Receptions', displayName: "Rec.", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Receptions == $scope.MaxReceptions ? "maxColValue" : "" } },
+            { name: 'stats.PassingINT', displayName: "Pass. INT", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingINT == $scope.MaxPassingINT ? "maxColValue" : "" } }
         ]
     };
 
@@ -67,6 +69,18 @@ HoundsControllers.controller('LeaguesCtrl', ['$scope', "$timeout", "LeagueFactor
                 $scope.$apply(function () {
                     $scope.Athletes = UIAthletes;
                     $scope.gridOptions.data = UIAthletes;
+                    $scope.MaxDeflections = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Deflections; })));
+                    $scope.MaxInterceptions = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Interceptions; })));
+                    $scope.MaxDefensiveTD = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.DefensiveTD; })));
+                    $scope.MaxFlagPulls = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.FlagPulls; })));
+                    $scope.MaxSacks = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Sacks; })));
+                    $scope.MaxSafety = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Safety; })));
+                    $scope.MaxTouchdowns = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Touchdowns; })));
+                    $scope.MaxPassingTD = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.PassingTD; })));
+                    $scope.MaxExtraPoints = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.ExtraPoints; })));
+                    $scope.MaxPassingXP = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.PassingXP; })));
+                    $scope.MaxReceptions = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Receptions; })));
+                    $scope.MaxPassingINT = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.PassingINT; })));
                 });
             }, data);
         });

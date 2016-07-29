@@ -17,3 +17,6 @@
 .ui-grid-top-panel{ background:#FFF; border-bottom:2px solid #ddd; }
 .ui-grid-header-cell { border: 0; }
 .ui-grid-pinned-container.ui-grid-pinned-container-left .ui-grid-header-cell:last-child { border: 0; }
+.ui-grid-row:nth-child(odd) .isSubPlayer .ui-grid-cell { background: #fcf8e3; }
+.ui-grid-row:nth-child(even) .isSubPlayer .ui-grid-cell { background: #eae7d2; }
+.maxColValue { font-weight: bold; }
