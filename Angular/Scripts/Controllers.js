@@ -16,6 +16,7 @@ HoundsControllers.controller('LeaguesCtrl', ['$scope', "$timeout", "LeagueFactor
         ],
         columnDefs: [
             { name: 'Name', width: 75, pinnedLeft: true },
+            { name: 'GP', displayName: "GP", width: 75, type: 'number' },
             { name: 'stats.Deflections', displayName: "Defl.", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Deflections == $scope.MaxDeflections ? "maxColValue" : "" } },
             { name: 'stats.Interceptions', displayName: "Int", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Interceptions == $scope.MaxInterceptions ? "maxColValue" : "" } },
             { name: 'stats.DefensiveTD', displayName: "Def. TD", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.DefensiveTD == $scope.MaxDefensiveTD ? "maxColValue" : "" } },
@@ -67,6 +68,7 @@ HoundsControllers.controller('LeaguesCtrl', ['$scope', "$timeout", "LeagueFactor
                         if (data.isDNP && !data.IsRegularPlayer) {
                             return;
                         }
+                        data.GP = stats[data.ID].length;
                         data.DGB = _.where(weeks, { "DGB": data.ID }).length;
                         data.OGB = _.where(weeks, { "OGB": data.ID }).length;
                         UIAthletes.push(data);
