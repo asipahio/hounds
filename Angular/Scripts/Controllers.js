@@ -1,6 +1,6 @@
 ﻿var HoundsControllers = angular.module('HoundsControllers', []);
 
-HoundsControllers.controller('LeaguesCtrl', ['$scope', "$timeout", "LeagueFactory", "SeasonsFactory", "AthleteFactory", "StatsFactory", function ($scope, $timeout, LeagueFactory, SeasonsFactory, AthleteFactory, StatsFactory) {
+HoundsControllers.controller('LeaguesCtrl', ['$scope', "$timeout", "LeagueFactory", "SeasonsFactory", "AthleteFactory", "StatsFactory", "WeeksFactory", function ($scope, $timeout, LeagueFactory, SeasonsFactory, AthleteFactory, StatsFactory, WeeksFactory) {
     LeagueFactory.GetAllLeagues(function (data) {
         $scope.$apply(function () {
             $scope.Leagues = data;
@@ -27,7 +27,9 @@ HoundsControllers.controller('LeaguesCtrl', ['$scope', "$timeout", "LeagueFactor
             { name: 'stats.ExtraPoints', displayName: "XP", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.ExtraPoints == $scope.MaxExtraPoints ? "maxColValue" : "" } },
             { name: 'stats.PassingXP', displayName: "Pass. XP", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingXP == $scope.MaxPassingXP ? "maxColValue" : "" } },
             { name: 'stats.Receptions', displayName: "Rec.", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Receptions == $scope.MaxReceptions ? "maxColValue" : "" } },
-            { name: 'stats.PassingINT', displayName: "Pass. INT", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingINT == $scope.MaxPassingINT ? "maxColValue" : "" } }
+            { name: 'stats.PassingINT', displayName: "Pass. INT", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingINT == $scope.MaxPassingINT ? "maxColValue" : "" } },
+            { name: 'DGB', displayName: "DGB", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.DGB == $scope.MaxDGB ? "maxColValue" : "" } },
+            { name: 'OGB', displayName: "OGB", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.OGB == $scope.MaxOGB ? "maxColValue" : "" } }
         ]
     };
 
@@ -37,52 +39,58 @@ HoundsControllers.controller('LeaguesCtrl', ['$scope', "$timeout", "LeagueFactor
         });
 
         AthleteFactory.GetAthletes(function (athletes) {
-            StatsFactory.GetSeasonStats(function (stats) {
-                var UIAthletes = [];
-                _.each(athletes, function (data, key) {
-                    data.stats = stats[data.ID];
-                    var totalStats = { Deflections: 0, Interceptions: 0, DefensiveTD: 0, FlagPulls: 0, Sacks: 0, Safety: 0, Touchdowns: 0, PassingTD: 0, ExtraPoints: 0, PassingXP: 0, Receptions: 0, PassingINT: 0 };
-                    if (data.stats && data.stats.length > 0) {
-                        _.each(data.stats, function (week, key) {
-                            totalStats.Deflections += week.Deflections;
-                            totalStats.Interceptions += week.Interceptions;
-                            totalStats.DefensiveTD += week.DefensiveTD;
-                            totalStats.FlagPulls += week.FlagPulls;
-                            totalStats.Sacks += week.Sacks;
-                            totalStats.Safety += week.Safety;
-                            totalStats.Touchdowns += week.Touchdowns;
-                            totalStats.PassingTD += week.PassingTD;
-                            totalStats.ExtraPoints += week.ExtraPoints;
-                            totalStats.PassingXP += week.PassingXP;
-                            totalStats.Receptions += week.Receptions;
-                            totalStats.PassingINT += week.PassingINT;
-                        });
-                    }
-                    data.stats = totalStats;
-                    data.isDNP = data.stats == undefined;
-                    data.AthleteID = key;
-                    if (data.isDNP && !data.IsRegularPlayer) {
-                        return;
-                    }
-                    UIAthletes.push(data);
-                });
-                $scope.$apply(function () {
-                    $scope.Athletes = UIAthletes;
-                    $scope.gridOptions.data = UIAthletes;
-                    $scope.MaxDeflections = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Deflections; })));
-                    $scope.MaxInterceptions = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Interceptions; })));
-                    $scope.MaxDefensiveTD = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.DefensiveTD; })));
-                    $scope.MaxFlagPulls = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.FlagPulls; })));
-                    $scope.MaxSacks = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Sacks; })));
-                    $scope.MaxSafety = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Safety; })));
-                    $scope.MaxTouchdowns = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Touchdowns; })));
-                    $scope.MaxPassingTD = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.PassingTD; })));
-                    $scope.MaxExtraPoints = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.ExtraPoints; })));
-                    $scope.MaxPassingXP = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.PassingXP; })));
-                    $scope.MaxReceptions = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Receptions; })));
-                    $scope.MaxPassingINT = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.PassingINT; })));
-                });
-            }, data);
+            WeeksFactory.GetCombinedWeeks(function (weeks) {
+                StatsFactory.GetSeasonStats(function (stats) {
+                    var UIAthletes = [];
+                    _.each(athletes, function (data, key) {
+                        data.stats = stats[data.ID];
+                        var totalStats = { Deflections: 0, Interceptions: 0, DefensiveTD: 0, FlagPulls: 0, Sacks: 0, Safety: 0, Touchdowns: 0, PassingTD: 0, ExtraPoints: 0, PassingXP: 0, Receptions: 0, PassingINT: 0 };
+                        if (data.stats && data.stats.length > 0) {
+                            _.each(data.stats, function (week, key) {
+                                totalStats.Deflections += week.Deflections;
+                                totalStats.Interceptions += week.Interceptions;
+                                totalStats.DefensiveTD += week.DefensiveTD;
+                                totalStats.FlagPulls += week.FlagPulls;
+                                totalStats.Sacks += week.Sacks;
+                                totalStats.Safety += week.Safety;
+                                totalStats.Touchdowns += week.Touchdowns;
+                                totalStats.PassingTD += week.PassingTD;
+                                totalStats.ExtraPoints += week.ExtraPoints;
+                                totalStats.PassingXP += week.PassingXP;
+                                totalStats.Receptions += week.Receptions;
+                                totalStats.PassingINT += week.PassingINT;
+                            });
+                        }
+                        data.stats = totalStats;
+                        data.isDNP = data.stats == undefined;
+                        data.AthleteID = key;
+                        if (data.isDNP && !data.IsRegularPlayer) {
+                            return;
+                        }
+                        data.DGB = _.where(weeks, { "DGB": data.ID }).length;
+                        data.OGB = _.where(weeks, { "OGB": data.ID }).length;
+                        UIAthletes.push(data);
+                    });
+                    $scope.$apply(function () {
+                        $scope.Athletes = UIAthletes;
+                        $scope.gridOptions.data = UIAthletes;
+                        $scope.MaxDeflections = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Deflections; })));
+                        $scope.MaxInterceptions = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Interceptions; })));
+                        $scope.MaxDefensiveTD = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.DefensiveTD; })));
+                        $scope.MaxFlagPulls = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.FlagPulls; })));
+                        $scope.MaxSacks = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Sacks; })));
+                        $scope.MaxSafety = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Safety; })));
+                        $scope.MaxTouchdowns = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Touchdowns; })));
+                        $scope.MaxPassingTD = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.PassingTD; })));
+                        $scope.MaxExtraPoints = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.ExtraPoints; })));
+                        $scope.MaxPassingXP = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.PassingXP; })));
+                        $scope.MaxReceptions = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Receptions; })));
+                        $scope.MaxPassingINT = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.PassingINT; })));
+                        $scope.MaxDGB = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.DGB; })));
+                        $scope.MaxOGB = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.OGB; })));
+                    });
+                }, data);
+            });
         });
     });
 }])

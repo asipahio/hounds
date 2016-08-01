@@ -37,6 +37,18 @@
     var ref = firebase.database().ref();
 
     return {
+        GetCombinedWeeks: function (callback) {
+            SeasonsFactory.GetCurrentSeasonID(function (data) {
+                firebase.database().ref('/Weeks/').orderByChild("SeasonID").equalTo(data).once('value').then(function (snapshot) {
+                    var data = [];
+                    snapshot.forEach(function (childSnapshot) {
+                        var obj = _.extend({ "ID": childSnapshot.getKey() }, childSnapshot.val());
+                        data.push(obj);
+                    });
+                    callback(data);
+                });
+            });
+        },
         GetAllWeeks: function (callback, LeagueID) {
             SeasonsFactory.GetCurrentSeasonID(function (data) {
                 firebase.database().ref('/Weeks/').orderByChild("SeasonID").equalTo(data).once('value').then(function (snapshot) {
