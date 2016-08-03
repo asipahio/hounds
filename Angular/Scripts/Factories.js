@@ -108,12 +108,12 @@
         },
         GetSeasonStats: function (callback, SeasonID) {
             firebase.database().ref('/Stats/').orderByChild("SeasonID").equalTo(SeasonID).once('value').then(function (snapshot) {
-                var data = [];
+                var stats = [];
                 snapshot.forEach(function (childSnapshot) {
                     var obj = _.extend({ "ID": childSnapshot.getKey() }, childSnapshot.val());
-                    data.push(obj);
+                    stats.push(obj);
                 });
-                callback(_.groupBy(data, 'AthleteID'));
+                callback(_.groupBy(stats, 'AthleteID'));
             });
         },
         GetSeasonStatsPerLeague: function (callback, SeasonID, LeagueID) {

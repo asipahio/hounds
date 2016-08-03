@@ -20,3 +20,9 @@
 .ui-grid-row:nth-child(odd) .isSubPlayer .ui-grid-cell { background: #fcf8e3; }
 .ui-grid-row:nth-child(even) .isSubPlayer .ui-grid-cell { background: #eae7d2; }
 .maxColValue { font-weight: bold; }
+
+.tabsWrap { padding: 15px; }
+    .tabsWrap .tab-content { border: 1px solid #ddd; border-top:0; }
+
+.ui-grid-row:nth-child(even) .ui-grid-cell.fantasy { background-color: #9decc8; }
+.ui-grid-row:nth-child(odd) .ui-grid-cell.fantasy { background: #baefd7; }

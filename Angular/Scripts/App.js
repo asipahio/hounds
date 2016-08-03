@@ -15,8 +15,33 @@ HoundsApp.config(['$locationProvider', '$compileProvider', function ($locationPr
     $locationProvider.html5Mode(false);
 }]);
 
-HoundsApp.run(["$rootScope", function ($rootScope) {
+HoundsApp.run(["$rootScope", "LeagueFactory", "WeeksFactory", function ($rootScope, LeagueFactory, WeeksFactory) {
     $rootScope.firebaseURL = "https://hounds-56073.firebaseio.com/";
+
+    $rootScope.Weeks = []
+    LeagueFactory.GetAllLeagues(function (leagues) {
+        for (var l in leagues) {
+            WeeksFactory.GetAllWeeks(function (weeks) {
+                for (var w in weeks) {
+                    weeks[w].LeagueName = _.find(leagues, { ID: weeks[w].LeagueID }).Name;
+                    $rootScope.Weeks.push(weeks[w]);
+                }
+            }, leagues[l].ID);
+        }
+    });
+
+    $rootScope.DeflectionCoef = 1;
+    $rootScope.InterceptionsCoef = 2.5;
+    $rootScope.DefensiveTDCoef = 6;
+    $rootScope.FlagPullsCoef = 0.5;
+    $rootScope.SacksCoef = 1;
+    $rootScope.SafetyCoef = 2;
+    $rootScope.TouchdownsCoef = 6;
+    $rootScope.PassingTDCoef = 4;
+    $rootScope.ExtraPointsCoef = 2;
+    $rootScope.PassingXPCoef = 2;
+    $rootScope.ReceptionsCoef = 0.5;
+    $rootScope.PassingINTCoef = -2.5;
 }]);
 
 
