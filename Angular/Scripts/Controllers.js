@@ -77,7 +77,7 @@ HoundsControllers.controller('LeaguesCtrl', ['$scope', "$timeout", "$rootScope",
                                 statPointsOffense += week.Receptions * $rootScope.ReceptionsCoef;
                                 statPointsOffense += week.PassingINT * $rootScope.PassingINTCoef;
                                 var LeagueName = _.find($rootScope.Weeks, { "ID": week.WeekID }).LeagueName;
-                                if (LeagueName != "Recreational") { totalStats.offensiveTotal *= 1.5; totalStats.defensiveTotal *= 1.5; }
+                                if (LeagueName != "Recreational") { statPointsOffense *= 1.5; statPointsDefense *= 1.5; }
                                 totalStats.offensiveTotal += statPointsOffense;
                                 totalStats.defensiveTotal += statPointsDefense;
                             });
