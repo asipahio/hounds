@@ -120,7 +120,7 @@ HoundsControllers.controller('LeaguesCtrl', ['$scope', "$timeout", "$rootScope",
     });
 }])
 
-HoundsControllers.controller('WeeksCtrl', ['$scope', "$routeParams", "WeeksFactory", "AthleteFactory", "StatsFactory", "uiGridConstants", function ($scope, $routeParams, WeeksFactory, AthleteFactory, StatsFactory, uiGridConstants) {
+HoundsControllers.controller('WeeksCtrl', ['$scope', "$routeParams", "$rootScope", "WeeksFactory", "AthleteFactory", "StatsFactory", "uiGridConstants", function ($scope, $routeParams, $rootScope, WeeksFactory, AthleteFactory, StatsFactory, uiGridConstants) {
     WeeksFactory.GetAllWeeks(function (data) {
         $scope.$apply(function () {
             $scope.Weeks = data;
@@ -204,7 +204,7 @@ HoundsControllers.controller('WeeksCtrl', ['$scope', "$routeParams", "WeeksFacto
     };
 }])
 
-HoundsControllers.controller('StatsCtrl', ['$scope', "$routeParams", "StatsFactory", "AthleteFactory", "WeeksFactory", "uiGridConstants", function ($scope, $routeParams, StatsFactory, AthleteFactory, WeeksFactory, uiGridConstants) {
+HoundsControllers.controller('StatsCtrl', ['$scope', "$routeParams", "$rootScope", "StatsFactory", "AthleteFactory", "WeeksFactory", "uiGridConstants", function ($scope, $routeParams, $rootScope, StatsFactory, AthleteFactory, WeeksFactory, uiGridConstants) {
     AthleteFactory.GetAthletes(function (athletes) {
         StatsFactory.GetStats(function (stats) {
             var UIAthletes = [];
