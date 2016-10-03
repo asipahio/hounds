@@ -159,12 +159,14 @@ HoundsControllers.controller('WeeksCtrl', ['$scope', "$routeParams", "$rootScope
                                              (data.stats.FlagPulls * $rootScope.FlagPullsCoef) +
                                              (data.stats.Sacks * $rootScope.SacksCoef) +
                                              (data.stats.Safety * $rootScope.SafetyCoef);
+                data.stats.DefensivePoints = Math.round(data.stats.DefensivePoints / stats[data.ID].length * 100) / 100;
                 data.stats.OffensivePoints = (data.stats.Touchdowns * $rootScope.TouchdownsCoef) +
                                              (data.stats.PassingTD * $rootScope.PassingTDCoef) +
                                              (data.stats.ExtraPoints * $rootScope.ExtraPointsCoef) +
                                              (data.stats.PassingXP * $rootScope.PassingXPCoef) +
                                              (data.stats.Receptions * $rootScope.ReceptionsCoef) +
                                              (data.stats.PassingINT * $rootScope.PassingINTCoef);
+                data.stats.OffensivePoints = Math.round(data.stats.OffensivePoints / stats[data.ID].length * 100) / 100;
                 data.stats.TotalPoints = data.stats.DefensivePoints + data.stats.OffensivePoints;
                 data.isDNP = data.stats == undefined;
                 data.AthleteID = key;
