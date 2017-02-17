@@ -42,6 +42,9 @@ HoundsApp.run(["$rootScope", "LeagueFactory", "WeeksFactory", function ($rootSco
     $rootScope.PassingXPCoef = 2;
     $rootScope.ReceptionsCoef = 0.5;
     $rootScope.PassingINTCoef = -2.5;
+    $rootScope.BigPlayRecCoef = 2;
+    $rootScope.BigPlayPassCoef = 1;
+    $rootScope.Drops = -1;
 }]);
 
 
