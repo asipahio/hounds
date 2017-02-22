@@ -32,12 +32,13 @@
     .dashboard .box { background: #FFF; padding:10px; }
         .dashboard .box h3 { margin: 0; padding: 5px 5px 10px 5px; border-bottom: 1px solid #dfdfdf; margin-bottom:10px; font-weight:bold; }
         .dashboard .box h4 { padding: 5px; }
-    .dashboard .separator { padding: 3px; background: #666; border-bottom-color: #666;  }
+    .dashboard .nested-table.table > tbody > tr > td.separator,.dashboard .nested-table.table > thead > tr > th.separator { padding: 1px; background: #666; border-bottom-color: #666;  }
     .dashboard tbody > tr:nth-of-type(odd) { background: none; }
     .dashboard tbody > tr:nth-child(4n+1) { background: #f9f9f9; }
     .dashboard tbody > tr:nth-of-type(odd) > td, .dashboard tbody > tr:nth-of-type(odd) > th { border-top-width: 2px; }
     .dashboard tbody > tr:nth-of-type(odd) > th { border-color: #9decc8; }
     .dashboard .parent-table.table-hover > tbody > tr:hover:nth-of-type(odd) { background-color: #b9efea; }
+    .dashboard .parent-table.table-hover > tbody > tr:hover:nth-of-type(odd)+tr{background-color: #b9efea; }
     .dashboard .parent-table.table-hover > tbody > tr:hover:nth-of-type(even) { background: none; }
         .dashboard .parent-table.table-hover > tbody > tr:nth-of-type(even) > td { padding: 15px; border:0; }
     .dashboard tbody > tr:nth-child(4n+1).isSubPlayer { background: #fcf8e3; }

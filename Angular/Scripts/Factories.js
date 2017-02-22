@@ -32,6 +32,16 @@
                 callback(latestSeason.ID);
             });
         },
+        GetAllSeasons: function (callback) {
+            firebase.database().ref('/Seasons/').once('value').then(function (snapshot) {
+                var data = [];
+                snapshot.forEach(function (childSnapshot) {
+                    var obj = _.extend({ "ID": childSnapshot.getKey() }, childSnapshot.val());
+                    data.push(obj);
+                });
+                callback(data);
+            });
+        },
         GetCurrentSeasonIDDeferred: function (q) {
             var self = this;
             firebase.database().ref('/Seasons/').orderByChild("StartDate").once('value').then(function (snapshot) {
@@ -76,6 +86,16 @@
                 });
             });
         },
+        GetAllWeeksBySeason: function (callback, SeasonID, LeagueID) {
+            firebase.database().ref('/Weeks/').orderByChild("SeasonID").equalTo(SeasonID).once('value').then(function (snapshot) {
+                var data = [];
+                snapshot.forEach(function (childSnapshot) {
+                    var obj = _.extend({ "ID": childSnapshot.getKey() }, childSnapshot.val());
+                    data.push(obj);
+                });
+                callback(_.where(data, { "LeagueID": LeagueID }));
+            });
+        },
         GetWeekDetails: function(callback, WeekID) {
             firebase.database().ref('/Weeks/').child(WeekID).on('value', function (snapshot) {
                 var obj = _.extend({ "ID": snapshot.getKey() }, snapshot.val());
@@ -84,7 +104,7 @@
         },
         UpdateWeek: function (callback, SeasonID, LeagueID, OGB, DGB, Week) {
             this.GetAllWeeks(function (weeks) {
-                var weeks = _.where(weeks, { "Week": Week });
+                weeks = _.where(weeks, { "Week": Week });
                 var updateObj = {
                     SeasonID: SeasonID,
                     LeagueID: LeagueID,
@@ -92,11 +112,12 @@
                     DGB: DGB ? DGB : null,
                     Week: Week
                 };
+                var weekKey;
                 if (weeks.length > 0) {
-                    var weekKey = weeks[0].ID;
+                    weekKey = weeks[0].ID;
                 }
                 else {
-                    var weekKey = firebase.database().ref().child("Weeks").push().key;
+                    weekKey = firebase.database().ref().child("Weeks").push().key;
                 }
                 var updates = {};
                 updates["/Weeks/" + weekKey] = updateObj;
@@ -162,10 +183,11 @@
                     Receptions: Athlete.stats.Receptions ? Athlete.stats.Receptions : 0,
                     PassingINT: Athlete.stats.PassingINT ? Athlete.stats.PassingINT : 0
                 };
+                var statId;
                 if (athleteStats.length > 0) {
-                    var statID = athleteStats[0].ID;
+                    statID = athleteStats[0].ID;
                 } else {
-                    var statID = firebase.database().ref().child("Stats").push().key;
+                    statID = firebase.database().ref().child("Stats").push().key;
                 }
                 var updates = {};
                 updates["/Stats/" + statID] = updateObj;

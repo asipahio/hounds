@@ -2,13 +2,13 @@
 <div class="col-md-4 col-xs-4">
     <div class="box">
         <h3>Season</h3>
-        <h4>{{ Season.Name }}</h4>
+        <select class="form-control" data-ng-model="Season" data-ng-options="s as s.Name for s in Seasons track by s.ID" data-ng-change="WeeksChanged()"></select>
     </div>
 </div>
 <div class="col-md-4 col-xs-4">
     <div class="box">
         <h3>League</h3>
-        <select class="form-control" data-ng-model="LeagueID" data-ng-options="l.ID as l.Name for l in Leagues" data-ng-change="LeagueChanged()"></select>
+        <select class="form-control" data-ng-model="LeagueID" data-ng-options="l.ID as l.Name for l in Leagues" data-ng-change="WeeksChanged()"><option value="">All</option></select>
     </div>
 </div>
 <div class="col-md-4 col-xs-4">
@@ -34,58 +34,58 @@
         <tbody>
             <tr data-ng-repeat-start="ath in Athletes | orderBy:orderClause:reverse" data-ng-class="{'isSubPlayer' : !ath.IsRegularPlayer}">
                 <th>{{ ath.Name }}</th>
-                <td>{{ ath.DefensivePoints }}</td>
-                <td>{{ ath.OffensivePoints }}</td>
+                <td>{{ ath.DefensivePoints }} <a data-ng-click="ath.isDefense = !ath.isDefense" class="pull-right"><i class="fa fa-bar-chart"></i></a></td>
+                <td>{{ ath.OffensivePoints }} <a data-ng-click="ath.isOffense = !ath.isOffense" class="pull-right"><i class="fa fa-bar-chart"></i></a></td>
                 <td>{{ ath.TotalPoints }}</td>
                 <td>{{ ath.DGB }}</td>
                 <td>{{ ath.OGB }}</td>
                 <td>{{ ath.GP }}</td>
             </tr>
-            <tr data-ng-repeat-end data-ng-show="isDefense || isOffense">
+            <tr data-ng-repeat-end data-ng-show="isDefense || isOffense || ath.isDefense || ath.isOffense">
                 <td colspan="7">
                     <table class="table table-condensed table-hover table-striped nested-table">
                         <thead>
                             <tr>
-                                <th data-ng-show="isDefense">Defl.</th>
-                                <th data-ng-show="isDefense">INT.</th>
-                                <th data-ng-show="isDefense">Def. TD</th>
-                                <th data-ng-show="isDefense">Flag Pulls</th>
-                                <th data-ng-show="isDefense">Sacks</th>
-                                <th data-ng-show="isDefense">Safety</th>
-                                <th data-ng-show="isDefense && isOffense" class="separator"></th>
-                                <th data-ng-show="isOffense">TD</th>
-                                <th data-ng-show="isOffense">Pass. TD</th>
-                                <th data-ng-show="isOffense">XP</th>
-                                <th data-ng-show="isOffense">Pass. XP</th>
-                                <th data-ng-show="isOffense">Rec.</th>
-                                <th data-ng-show="isOffense">Car.</th>
-                                <th data-ng-show="isOffense">Pass. INT</th>
-                                <th data-ng-show="isOffense">Rec. 20+ Yds</th>
-                                <th data-ng-show="isOffense">Rush. 20+ Yds</th>
-                                <th data-ng-show="isOffense">Pass. 20+ Yds</th>
-                                <th data-ng-show="isOffense">Drops</th>
+                                <th data-ng-show="isDefense || ath.isDefense">Defl.</th>
+                                <th data-ng-show="isDefense || ath.isDefense">INT.</th>
+                                <th data-ng-show="isDefense || ath.isDefense">Def. TD</th>
+                                <th data-ng-show="isDefense || ath.isDefense">Flag Pulls</th>
+                                <th data-ng-show="isDefense || ath.isDefense">Sacks</th>
+                                <th data-ng-show="isDefense || ath.isDefense">Safety</th>
+                                <th data-ng-show="(isDefense && isOffense) || (ath.isDefense && ath.isOffense)" class="separator"></th>
+                                <th data-ng-show="isOffense || ath.isOffense">TD</th>
+                                <th data-ng-show="isOffense || ath.isOffense">Pass. TD</th>
+                                <th data-ng-show="isOffense || ath.isOffense">XP</th>
+                                <th data-ng-show="isOffense || ath.isOffense">Pass. XP</th>
+                                <th data-ng-show="isOffense || ath.isOffense">Rec.</th>
+                                <th data-ng-show="isOffense || ath.isOffense">Car.</th>
+                                <th data-ng-show="isOffense || ath.isOffense">Pass. INT</th>
+                                <th data-ng-show="isOffense || ath.isOffense">Rec. 20+ Yds</th>
+                                <th data-ng-show="isOffense || ath.isOffense">Rush. 20+ Yds</th>
+                                <th data-ng-show="isOffense || ath.isOffense">Pass. 20+ Yds</th>
+                                <th data-ng-show="isOffense || ath.isOffense">Drops</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td data-ng-show="isDefense">{{ ath.Deflections }}</td>
-                                <td data-ng-show="isDefense">{{ ath.Interceptions }}</td>
-                                <td data-ng-show="isDefense">{{ ath.DefensiveTD }}</td>
-                                <td data-ng-show="isDefense">{{ ath.FlagPulls }}</td>
-                                <td data-ng-show="isDefense">{{ ath.Sacks }}</td>
-                                <td data-ng-show="isDefense">{{ ath.Safety }}</td>
-                                <td data-ng-show="isDefense && isOffense" class="separator"></td>
-                                <td data-ng-show="isOffense">{{ ath.Touchdowns }}</td>
-                                <td data-ng-show="isOffense">{{ ath.PassingTD }}</td>
-                                <td data-ng-show="isOffense">{{ ath.ExtraPoints }}</td>
-                                <td data-ng-show="isOffense">{{ ath.PassingXP }}</td>
-                                <td data-ng-show="isOffense">{{ ath.Receptions }}</td>
-                                <td data-ng-show="isOffense">{{ ath.Rushes }}</td>
-                                <td data-ng-show="isOffense">{{ ath.PassingINT }}</td>
-                                <td data-ng-show="isOffense">{{ ath.Rec20Yds }}</td>
-                                <td data-ng-show="isOffense">{{ ath.Rush20Yds }}</td>
-                                <td data-ng-show="isOffense">{{ ath.Pass20Yds }}</td>
-                                <td data-ng-show="isOffense">{{ ath.Drops }}</td>
+                                <td data-ng-show="isDefense || ath.isDefense">{{ ath.Deflections }}</td>
+                                <td data-ng-show="isDefense || ath.isDefense">{{ ath.Interceptions }}</td>
+                                <td data-ng-show="isDefense || ath.isDefense">{{ ath.DefensiveTD }}</td>
+                                <td data-ng-show="isDefense || ath.isDefense">{{ ath.FlagPulls }}</td>
+                                <td data-ng-show="isDefense || ath.isDefense">{{ ath.Sacks }}</td>
+                                <td data-ng-show="isDefense || ath.isDefense">{{ ath.Safety }}</td>
+                                <td data-ng-show="(isDefense && isOffense) || (ath.isDefense && ath.isOffense)" class="separator"></td>
+                                <td data-ng-show="isOffense || ath.isOffense">{{ ath.Touchdowns }}</td>
+                                <td data-ng-show="isOffense || ath.isOffense">{{ ath.PassingTD }}</td>
+                                <td data-ng-show="isOffense || ath.isOffense">{{ ath.ExtraPoints }}</td>
+                                <td data-ng-show="isOffense || ath.isOffense">{{ ath.PassingXP }}</td>
+                                <td data-ng-show="isOffense || ath.isOffense">{{ ath.Receptions }}</td>
+                                <td data-ng-show="isOffense || ath.isOffense">{{ ath.Rushes }}</td>
+                                <td data-ng-show="isOffense || ath.isOffense">{{ ath.PassingINT }}</td>
+                                <td data-ng-show="isOffense || ath.isOffense">{{ ath.Rec20Yds }}</td>
+                                <td data-ng-show="isOffense || ath.isOffense">{{ ath.Rush20Yds }}</td>
+                                <td data-ng-show="isOffense || ath.isOffense">{{ ath.Pass20Yds }}</td>
+                                <td data-ng-show="isOffense || ath.isOffense">{{ ath.Drops }}</td>
                             </tr>
                         </tbody>
                     </table>

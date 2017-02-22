@@ -18,7 +18,7 @@ HoundsApp.config(['$locationProvider', '$compileProvider', function ($locationPr
 HoundsApp.run(["$rootScope", "LeagueFactory", "WeeksFactory", function ($rootScope, LeagueFactory, WeeksFactory) {
     $rootScope.firebaseURL = "https://hounds-56073.firebaseio.com/";
 
-    $rootScope.Weeks = []
+    $rootScope.Weeks = [];
     LeagueFactory.GetAllLeagues(function (leagues) {
         for (var l in leagues) {
             WeeksFactory.GetAllWeeks(function (weeks) {
@@ -101,6 +101,6 @@ HoundsApp.run(["$rootScope", "LeagueFactory", "WeeksFactory", function ($rootSco
                 url: "/UpdateWeeks",
                 config: { templateUrl: "Angular/Templates/UpdateWeeks.html", controller: "UpdateWeeksCtrl" }
             }
-        ]
+        ];
     }
 })();
