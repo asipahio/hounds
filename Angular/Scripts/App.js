@@ -41,10 +41,12 @@ HoundsApp.run(["$rootScope", "LeagueFactory", "WeeksFactory", function ($rootSco
     $rootScope.ExtraPointsCoef = 2;
     $rootScope.PassingXPCoef = 2;
     $rootScope.ReceptionsCoef = 0.5;
+    $rootScope.RushesCoef = 0.5;
     $rootScope.PassingINTCoef = -2.5;
-    $rootScope.BigPlayRecCoef = 2;
-    $rootScope.BigPlayPassCoef = 1;
-    $rootScope.Drops = -1;
+    $rootScope.Rec20YdsCoef = 2;
+    $rootScope.Rush20YdsCoef = 2;
+    $rootScope.Pass20YdsCoef = 1;
+    $rootScope.DropsCoef = -1;
 }]);
 
 
@@ -59,36 +61,45 @@ HoundsApp.run(["$rootScope", "LeagueFactory", "WeeksFactory", function ($rootSco
             $routeProvider.when(route.url, route.config);
         });
 
-        $routeProvider.otherwise({ redirectTo: 'Leagues' });
+        $routeProvider.otherwise({ redirectTo: 'Dashboard' });
 
     }
 
     function getRoutes() {
         return [
 			{
-			    url: "/Leagues",
-			    config: { templateUrl: "Angular/Templates/Leagues.html", controller: "LeaguesCtrl" }
-
+                url: "/Leagues",
+                config: { templateUrl: "Angular/Templates/Leagues.html", controller: "LeaguesCtrl" }
+			},
+			{
+                url: "/Dashboard",
+                config: {
+                    templateUrl: "Angular/Templates/Dashboard.html",
+                    controller: "DashboardCtrl",
+                    resolve: {
+                        'DashboardCtrl': ['$q', 'SeasonsFactory', function ($q, SeasonsFactory) {
+                            var defer = $q.defer();
+                            SeasonsFactory.GetCurrentSeasonIDDeferred(defer);
+                            return defer.promise;
+                        }]
+                    },
+                }
 			},
             {
                 url: "/Weeks/:SeasonID/:LeagueID",
                 config: { templateUrl: "Angular/Templates/Weeks.html", controller: "WeeksCtrl" }
-
             },
             {
                 url: "/Stats/:SeasonID/:LeagueID/:WeekID",
                 config: { templateUrl: "Angular/Templates/Stats.html", controller: "StatsCtrl" }
-
             },
             {
                 url: "/Update",
                 config: { templateUrl: "Angular/Templates/Update.html", controller: "UpdateCtrl" }
-
             },
             {
                 url: "/UpdateWeeks",
                 config: { templateUrl: "Angular/Templates/UpdateWeeks.html", controller: "UpdateWeeksCtrl" }
-
             }
         ]
     }

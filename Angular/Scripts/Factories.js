@@ -20,14 +20,29 @@
     var ref = firebase.database().ref();
 
     return {
+        LatestSeason:{},
         GetCurrentSeasonID: function (callback) {
-            firebase.database().ref('/Seasons/').orderByChild("StartDate").endAt(new Date().getTime()).limitToFirst(1).once('value').then(function (snapshot) {
+            firebase.database().ref('/Seasons/').orderByChild("StartDate").once('value').then(function (snapshot) {
                 var data = [];
                 snapshot.forEach(function (childSnapshot) {
                     var obj = _.extend({ "ID": childSnapshot.getKey() }, childSnapshot.val());
                     data.push(obj);
                 });
-                callback(data[0].ID);
+                var latestSeason = _.sortBy(data, "StartDate").reverse()[0];
+                callback(latestSeason.ID);
+            });
+        },
+        GetCurrentSeasonIDDeferred: function (q) {
+            var self = this;
+            firebase.database().ref('/Seasons/').orderByChild("StartDate").once('value').then(function (snapshot) {
+                var data = [];
+                snapshot.forEach(function (childSnapshot) {
+                    var obj = _.extend({ "ID": childSnapshot.getKey() }, childSnapshot.val());
+                    data.push(obj);
+                });
+                var latestSeason = _.sortBy(data, "StartDate").reverse()[0];
+                self.LatestSeason = latestSeason;
+                q.resolve();
             });
         }
     }
@@ -145,7 +160,7 @@
                     ExtraPoints: Athlete.stats.ExtraPoints ? Athlete.stats.ExtraPoints : 0,
                     PassingXP: Athlete.stats.PassingXP ? Athlete.stats.PassingXP : 0,
                     Receptions: Athlete.stats.Receptions ? Athlete.stats.Receptions : 0,
-                    PassingINT: Athlete.stats.PassingINT ? Athlete.stats.PassingINT : 0,
+                    PassingINT: Athlete.stats.PassingINT ? Athlete.stats.PassingINT : 0
                 };
                 if (athleteStats.length > 0) {
                     var statID = athleteStats[0].ID;
