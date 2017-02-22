@@ -93,7 +93,11 @@
                     var obj = _.extend({ "ID": childSnapshot.getKey() }, childSnapshot.val());
                     data.push(obj);
                 });
-                callback(_.where(data, { "LeagueID": LeagueID }));
+                if (LeagueID) {
+                    callback(_.where(data, { "LeagueID": LeagueID }));
+                } else {
+                    callback(data);
+                }
             });
         },
         GetWeekDetails: function(callback, WeekID) {
