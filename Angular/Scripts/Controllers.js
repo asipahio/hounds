@@ -1,5 +1,94 @@
 ﻿var HoundsControllers = angular.module('HoundsControllers', []);
 
+HoundsControllers.controller('DashboardCtrl', ['$scope', "$timeout", "$rootScope", "LeagueFactory", "SeasonsFactory", "AthleteFactory", "StatsFactory", "WeeksFactory", function ($scope, $timeout, $rootScope, LeagueFactory, SeasonsFactory, AthleteFactory, StatsFactory, WeeksFactory) {
+    $rootScope.bodyClass = "dashboard";
+    $scope.LeagueID = "-KNmj6qEAPqH60tZ_pur";
+    $scope.WeekID = null;
+
+    $scope.Season = SeasonsFactory.LatestSeason;
+    LeagueFactory.GetAllLeagues(function (data) {
+        $scope.$apply(function () {
+            $scope.Leagues = data;
+        });
+    });
+    $scope.LeagueChanged = function () {
+        WeeksFactory.GetAllWeeks(function (data) {
+            $scope.$apply(function () {
+                $scope.Weeks = data;
+            });
+        }, $scope.LeagueID);
+    }
+
+    AthleteFactory.GetAthletes(function (athletes) {
+        $scope.Athletes = athletes;
+        $scope.GetStats();
+    });
+
+    $scope.GetStats = function () {
+        StatsFactory.GetSeasonStats(function (data) {
+            $scope.Stats = data;
+            $scope.GetPoints();
+        }, $scope.Season.ID);
+    };
+
+    $scope.GetPoints = function () {
+        _.each($scope.Athletes, function (data, key) {
+            var stats = $scope.Stats[data.ID];
+            if ($scope.WeekID !== null) {
+                stats = _.where(stats, { "WeekID": $scope.WeekID });
+            }
+            var defensePoints = 0, offensePoints = 0;
+            data.Deflections = _.reduce(stats, function(memo, num){ return memo + num.Deflections; }, 0);
+            data.Interceptions = _.reduce(stats, function(memo, num){ return memo + num.Interceptions; }, 0);
+            data.DefensiveTD = _.reduce(stats, function(memo, num){ return memo + num.DefensiveTD; }, 0);
+            data.FlagPulls = _.reduce(stats, function(memo, num){ return memo + num.FlagPulls; }, 0);
+            data.Sacks = _.reduce(stats, function(memo, num){ return memo + num.Sacks; }, 0);
+            data.Safety = _.reduce(stats, function(memo, num){ return memo + num.Safety; }, 0);
+
+            defensePoints += data.Deflections * $rootScope.DeflectionCoef;
+            defensePoints += data.Interceptions * $rootScope.InterceptionsCoef;
+            defensePoints += data.DefensiveTD * $rootScope.DefensiveTDCoef;
+            defensePoints += data.FlagPulls * $rootScope.FlagPullsCoef;
+            defensePoints += data.Sacks * $rootScope.SacksCoef;
+            defensePoints += data.Safety * $rootScope.SafetyCoef;
+
+            data.Touchdowns = _.reduce(stats, function (memo, num) { return memo + num.Touchdowns; }, 0);
+            data.PassingTD = _.reduce(stats, function (memo, num) { return memo + num.PassingTD; }, 0);
+            data.ExtraPoints = _.reduce(stats, function (memo, num) { return memo + num.ExtraPoints; }, 0);
+            data.PassingXP = _.reduce(stats, function (memo, num) { return memo + num.PassingXP; }, 0);
+            data.Receptions = _.reduce(stats, function (memo, num) { return memo + num.Receptions; }, 0);
+            data.Rushes = _.reduce(stats, function (memo, num) { return memo + (num.Rushes == undefined ? 0 : num.Rushes); }, 0);
+            data.PassingINT = _.reduce(stats, function (memo, num) { return memo + num.PassingINT; }, 0);
+            data.Rec20Yds = _.reduce(stats, function (memo, num) { return memo + num.Rec20Yds; }, 0);
+            data.Rush20Yds = _.reduce(stats, function (memo, num) { return memo + (num.Rush20Yds == undefined ? 0 : num.Rush20Yds); }, 0);
+            data.Pass20Yds = _.reduce(stats, function (memo, num) { return memo + num.Pass20Yds; }, 0);
+            data.Drops = _.reduce(stats, function (memo, num) { return memo + num.Drops; }, 0);
+
+            offensePoints += data.Touchdowns * $rootScope.TouchdownsCoef;
+            offensePoints += data.PassingTD * $rootScope.PassingTDCoef;
+            offensePoints += data.ExtraPoints * $rootScope.ExtraPointsCoef;
+            offensePoints += data.PassingXP * $rootScope.PassingXPCoef;
+            offensePoints += data.Receptions * $rootScope.ReceptionsCoef;
+            offensePoints += data.Rushes* $rootScope.RushesCoef;
+            offensePoints += data.PassingINT * $rootScope.PassingINTCoef;
+            offensePoints += data.Rec20Yds * $rootScope.Rec20YdsCoef;
+            offensePoints += data.Rush20Yds* $rootScope.Rush20YdsCoef;
+            offensePoints += data.Pass20Yds * $rootScope.Pass20YdsCoef;
+            offensePoints += data.Drops * $rootScope.DropsCoef;
+            data.DefensivePoints = defensePoints;
+            data.OffensivePoints = offensePoints;
+            data.TotalPoints = offensePoints + defensePoints;
+            data.GP = stats == undefined ? 0 : stats.length;
+            data.AthleteID = key;
+            data.DGB = _.where($scope.Weeks, { "DGB": data.ID }).length;
+            data.OGB = _.where($scope.Weeks, { "OGB": data.ID }).length;
+        });
+    }
+
+    $scope.LeagueChanged();
+}]);
+
+
 HoundsControllers.controller('LeaguesCtrl', ['$scope', "$timeout", "$rootScope", "LeagueFactory", "SeasonsFactory", "AthleteFactory", "StatsFactory", "WeeksFactory", "uiGridConstants", function ($scope, $timeout, $rootScope, LeagueFactory, SeasonsFactory, AthleteFactory, StatsFactory, WeeksFactory, uiGridConstants) {
     LeagueFactory.GetAllLeagues(function (data) {
         $scope.$apply(function () {
@@ -32,8 +121,8 @@ HoundsControllers.controller('LeaguesCtrl', ['$scope', "$timeout", "$rootScope",
             { name: 'stats.PassingXP', displayName: "Pass. XP", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingXP == $scope.MaxPassingXP ? "maxColValue" : "" } },
             { name: 'stats.Receptions', displayName: "Rec.", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Receptions == $scope.MaxReceptions ? "maxColValue" : "" } },
             { name: 'stats.PassingINT', displayName: "Pass. INT", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingINT == $scope.MaxPassingINT ? "maxColValue" : "" } }, ,
-            { name: 'stats.BigPlayRec', displayName: "Rec. 20+ yds", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.BigPlayRec == $scope.MaxBigPlayRec ? "maxColValue" : "" } },
-            { name: 'stats.BigPlayPass', displayName: "Pass.  20+ yds", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.BigPlayPass == $scope.MaxBigPlayPass ? "maxColValue" : "" } },
+            { name: 'stats.Rec20Yds', displayName: "Rec. 20+ yds", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Rec20Yds == $scope.MaxRec20Yds ? "maxColValue" : "" } },
+            { name: 'stats.Pass20Yds', displayName: "Pass.  20+ yds", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Pass20Yds == $scope.MaxPass20Yds ? "maxColValue" : "" } },
             { name: 'stats.Drops', displayName: "Drops", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Drops == $scope.MaxDrops ? "maxColValue" : "" } },
             { name: 'DGB', displayName: "DGB", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.DGB == $scope.MaxDGB ? "maxColValue" : "" } },
             { name: 'OGB', displayName: "OGB", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.OGB == $scope.MaxOGB ? "maxColValue" : "" } }
@@ -51,9 +140,15 @@ HoundsControllers.controller('LeaguesCtrl', ['$scope', "$timeout", "$rootScope",
                     var UIAthletes = [];
                     _.each(athletes, function (data, key) {
                         data.stats = stats[data.ID];
-                        var totalStats = { Deflections: 0, Interceptions: 0, DefensiveTD: 0, FlagPulls: 0, Sacks: 0, Safety: 0, Touchdowns: 0, PassingTD: 0, ExtraPoints: 0, PassingXP: 0, Receptions: 0, PassingINT: 0, offensiveTotal: 0, defensiveTotal: 0, totalPts: 0, BigPlayPass: 0, BigPlayRec: 0, Drops: 0 };
+                        if(data.stats == undefined){ return; }
+                        var totalStats = { Deflections: 0, Interceptions: 0, DefensiveTD: 0, FlagPulls: 0, Sacks: 0, Safety: 0, Touchdowns: 0, PassingTD: 0, ExtraPoints: 0, PassingXP: 0, Receptions: 0, PassingINT: 0, offensiveTotal: 0, defensiveTotal: 0, totalPts: 0, Pass20Yds: 0, Rec20Yds: 0, Drops: 0 };
                         if (data.stats && data.stats.length > 0) {
                             _.each(data.stats, function (week, key) {
+
+                                week.Rec20Yds = week.Rec20Yds == undefined ? 0 : week.Rec20Yds;
+                                week.Pass20Yds = week.Pass20Yds == undefined ? 0 : week.Pass20Yds;
+                                week.Drops = week.Drops == undefined ? 0 : week.Drops;
+
                                 var statPointsDefense = 0, statPointsOffense = 0;
                                 totalStats.Deflections += week.Deflections;
                                 totalStats.Interceptions += week.Interceptions;
@@ -67,9 +162,9 @@ HoundsControllers.controller('LeaguesCtrl', ['$scope', "$timeout", "$rootScope",
                                 totalStats.PassingXP += week.PassingXP;
                                 totalStats.Receptions += week.Receptions;
                                 totalStats.PassingINT += week.PassingINT;
-                                totalStats.BigPlayRec += week.BigPlayRec;
-                                totalStats.BigPlayPass += week.BigPlayPass;
-                                totalStats.Drops = += week.Drops;
+                                totalStats.Rec20Yds += week.Rec20Yds;
+                                totalStats.Pass20Yds += week.Pass20Yds;
+                                totalStats.Drops += week.Drops;
                                 statPointsDefense += week.Deflections * $rootScope.DeflectionCoef;
                                 statPointsDefense += week.Interceptions * $rootScope.InterceptionsCoef;
                                 statPointsDefense += week.DefensiveTD * $rootScope.DefensiveTDCoef;
@@ -82,9 +177,9 @@ HoundsControllers.controller('LeaguesCtrl', ['$scope', "$timeout", "$rootScope",
                                 statPointsOffense += week.PassingXP * $rootScope.PassingXPCoef;
                                 statPointsOffense += week.Receptions * $rootScope.ReceptionsCoef;
                                 statPointsOffense += week.PassingINT * $rootScope.PassingINTCoef;
-                                statPointsOffense += week.BigPlayRec * $rootScope.BigPlayRecCoef;
-                                statPointsOffense += week.BigPlayPass * $rootScope.BigPlayPassCoef;
-                                statPointsOffense += week.Drops * $rootScope.Drops;
+                                statPointsOffense += week.Rec20Yds * $rootScope.Rec20YdsCoef;
+                                statPointsOffense += week.Pass20Yds * $rootScope.Pass20YdsCoef;
+                                statPointsOffense += week.Drops * $rootScope.DropsCoef;
                                 var LeagueName = _.find($rootScope.Weeks, { "ID": week.WeekID }).LeagueName;
                                 if (LeagueName != "Recreational") { statPointsOffense *= 1.5; statPointsDefense *= 1.5; }
                                 totalStats.offensiveTotal += statPointsOffense;
@@ -120,8 +215,8 @@ HoundsControllers.controller('LeaguesCtrl', ['$scope', "$timeout", "$rootScope",
                         $scope.MaxPassingXP = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.PassingXP; })));
                         $scope.MaxReceptions = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Receptions; })));
                         $scope.MaxPassingINT = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.PassingINT; })));
-                        $scope.MaxBigPlayRec = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.BigPlayRec; })));
-                        $scope.MaxBigPlayPass = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.BigPlayPass; })));
+                        $scope.MaxRec20Yds = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Rec20Yds; })));
+                        $scope.MaxPass20Yds = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Pass20Yds; })));
                         $scope.MaxDrops = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.stats.Drops; })));
                         $scope.MaxDGB = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.DGB; })));
                         $scope.MaxOGB = Math.max.apply(null, (_.map(UIAthletes, function (item) { return item.OGB; })));
@@ -147,9 +242,15 @@ HoundsControllers.controller('WeeksCtrl', ['$scope', "$routeParams", "$rootScope
             var UIAthletes = [];
             _.each(athletes, function (data, key) {
                 data.stats = stats[data.ID];
-                var totalStats = { Deflections: 0, Interceptions: 0, DefensiveTD: 0, FlagPulls: 0, Sacks: 0, Safety: 0, Touchdowns: 0, PassingTD: 0, ExtraPoints: 0, PassingXP: 0, Receptions: 0, PassingINT: 0, BigPlayPass: 0, BigPlayRec: 0 };
+                if (data.stats == undefined) { return; }
+                var totalStats = { Deflections: 0, Interceptions: 0, DefensiveTD: 0, FlagPulls: 0, Sacks: 0, Safety: 0, Touchdowns: 0, PassingTD: 0, ExtraPoints: 0, PassingXP: 0, Receptions: 0, PassingINT: 0, Pass20Yds: 0, Rec20Yds: 0, Drops: 0 };
                 if (data.stats && data.stats.length > 0) {
                     _.each(data.stats, function (week, key) {
+
+                        week.Rec20Yds = week.Rec20Yds == undefined ? 0 : week.Rec20Yds;
+                        week.Pass20Yds = week.Pass20Yds == undefined ? 0 : week.Pass20Yds;
+                        week.Drops = week.Drops == undefined ? 0 : week.Drops;
+
                         totalStats.Deflections += week.Deflections;
                         totalStats.Interceptions += week.Interceptions;
                         totalStats.DefensiveTD += week.DefensiveTD;
@@ -162,8 +263,8 @@ HoundsControllers.controller('WeeksCtrl', ['$scope', "$routeParams", "$rootScope
                         totalStats.PassingXP += week.PassingXP;
                         totalStats.Receptions += week.Receptions;
                         totalStats.PassingINT += week.PassingINT;
-                        totalStats.BigPlayRec += week.BigPlayRec;
-                        totalStats.BigPlayPass += week.BigPlayPass;
+                        totalStats.Rec20Yds += week.Rec20Yds;
+                        totalStats.Pass20Yds += week.Pass20Yds;
                         totalStats.Drops += week.Drops;
                     });
                 }
@@ -181,9 +282,9 @@ HoundsControllers.controller('WeeksCtrl', ['$scope', "$routeParams", "$rootScope
                                              (data.stats.PassingXP * $rootScope.PassingXPCoef) +
                                              (data.stats.Receptions * $rootScope.ReceptionsCoef) +
                                              (data.stats.PassingINT * $rootScope.PassingINTCoef) + 
-                                             (data.stats.BigPlayRec * $rootScope.BigPlayRecCoef) + 
+                                             (data.stats.Rec20Yds * $rootScope.Rec20YdsCoef) + 
                                              (data.stats.Drops * $rootScope.DropsCoef) +
-                                             (data.stats.BigPlayPass * $rootScope.BigPlayPassCoef);
+                                             (data.stats.Pass20Yds * $rootScope.Pass20YdsCoef);
                 data.stats.OffensivePoints = Math.round(data.stats.OffensivePoints / stats[data.ID].length * 100) / 100;
                 data.stats.TotalPoints = data.stats.DefensivePoints + data.stats.OffensivePoints;
                 data.isDNP = data.stats == undefined;
@@ -220,8 +321,8 @@ HoundsControllers.controller('WeeksCtrl', ['$scope', "$routeParams", "$rootScope
             { name: 'stats.PassingXP', displayName: "Pass. XP", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingXP == $scope.MaxPassingXP ? "maxColValue" : "" } },
             { name: 'stats.Receptions', displayName: "Rec.", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Receptions == $scope.MaxReceptions ? "maxColValue" : "" } },
             { name: 'stats.PassingINT', displayName: "Pass. INT", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingINT == $scope.MaxPassingINT ? "maxColValue" : "" } },
-            { name: 'stats.BigPlayRec', displayName: "Rec. 20+ yds", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.BigPlayRec == $scope.MaxBigPlayRec ? "maxColValue" : "" } },
-            { name: 'stats.BigPlayPass', displayName: "Pass. 20+ yds", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.BigPlayPass == $scope.MaxBigPlayPass ? "maxColValue" : "" } },
+            { name: 'stats.Rec20Yds', displayName: "Rec. 20+ yds", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Rec20Yds == $scope.MaxRec20Yds ? "maxColValue" : "" } },
+            { name: 'stats.Pass20Yds', displayName: "Pass. 20+ yds", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Pass20Yds == $scope.MaxPass20Yds ? "maxColValue" : "" } },
             { name: 'stats.Drops', displayName: "Drops", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Drops == $scope.MaxDrops ? "maxColValue" : "" } }
         ]
     };
@@ -235,8 +336,13 @@ HoundsControllers.controller('StatsCtrl', ['$scope', "$routeParams", "$rootScope
                 data.stats = _.findWhere(stats, { "AthleteID": data.ID });
                 data.isDNP = data.stats == undefined;
                 if (data.isDNP) {
-                    data.stats = { Deflections: 0, DefensiveTD: 0, Interceptions: 0, FlagPulls: 0, Sacks: 0, Safety: 0, Touchdowns: 0, PassingTD: 0, ExtraPoints: 0, PassingXP: 0, Receptions: 0, PassingINT: 0, BigPlayPass: 0, BigPlayRec: 0, Drops:0 };
+                    data.stats = { Deflections: 0, DefensiveTD: 0, Interceptions: 0, FlagPulls: 0, Sacks: 0, Safety: 0, Touchdowns: 0, PassingTD: 0, ExtraPoints: 0, PassingXP: 0, Receptions: 0, PassingINT: 0, Pass20Yds: 0, Rec20Yds: 0, Drops:0 };
                 }
+
+                data.stats.Rec20Yds = data.stats.Rec20Yds == undefined ? 0 : data.stats.Rec20Yds;
+                data.stats.Pass20Yds = data.stats.Pass20Yds == undefined ? 0 : data.stats.Pass20Yds;
+                data.stats.Drops = data.stats.Drops == undefined ? 0 : data.stats.Drops;
+
                 data.stats.DefensivePoints = (data.stats.Deflections * $rootScope.DeflectionCoef) +
                                              (data.stats.Interceptions * $rootScope.InterceptionsCoef) +
                                              (data.stats.DefensiveTD * $rootScope.DefensiveTDCoef) +
@@ -249,9 +355,9 @@ HoundsControllers.controller('StatsCtrl', ['$scope', "$routeParams", "$rootScope
                                              (data.stats.PassingXP * $rootScope.PassingXPCoef) +
                                              (data.stats.Receptions * $rootScope.ReceptionsCoef) +
                                              (data.stats.PassingINT * $rootScope.PassingINTCoef) +
-                                             (data.stats.BigPlayRec * $rootScope.BigPlayRecCoef) +
-                                             (data.stats.BigPlayPass * $rootScope.BigPlayPassCoef) +
-                                             (data.stats.Drops * $rootScope.Drops);
+                                             (data.stats.Rec20Yds * $rootScope.Rec20YdsCoef) +
+                                             (data.stats.Pass20Yds * $rootScope.Pass20YdsCoef) +
+                                             (data.stats.Drops * $rootScope.DropsCoef);
                 data.stats.TotalPoints = data.stats.DefensivePoints + data.stats.OffensivePoints;
                 data.AthleteID = key;
                 if (data.isDNP && !data.IsRegularPlayer) {
@@ -294,9 +400,9 @@ HoundsControllers.controller('StatsCtrl', ['$scope', "$routeParams", "$rootScope
             { name: 'stats.PassingXP', displayName: "Pass. XP", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingXP == $scope.MaxPassingXP ? "maxColValue" : "" } },
             { name: 'stats.Receptions', displayName: "Rec.", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Receptions == $scope.MaxReceptions ? "maxColValue" : "" } },
             { name: 'stats.PassingINT', displayName: "Pass. INT", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingINT == $scope.MaxPassingINT ? "maxColValue" : "" } },
-            { name: 'stats.BigPlayRec', displayName: "Rec.", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.BigPlayRec == $scope.MaxBigPlayRec ? "maxColValue" : "" } },
-            { name: 'stats.BigPlayPass', displayName: "Pass. INT", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.BigPlayPass == $scope.MaxBigPlayPass ? "maxColValue" : "" } },
-            { name: 'stats.Drops', displayName: "Pass. INT", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Drops == $scope.MaxDrops ? "maxColValue" : "" } }
+            { name: 'stats.Rec20Yds', displayName: "Rec. 20+ Yds", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Rec20Yds == $scope.MaxRec20Yds ? "maxColValue" : "" } },
+            { name: 'stats.Pass20Yds', displayName: "Pass. 20+ Yds", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Pass20Yds == $scope.MaxPass20Yds ? "maxColValue" : "" } },
+            { name: 'stats.Drops', displayName: "Drops", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Drops == $scope.MaxDrops ? "maxColValue" : "" } }
         ]
     };
 }])
