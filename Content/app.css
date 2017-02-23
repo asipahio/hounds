@@ -41,8 +41,7 @@
     .dashboard .parent-table.table-hover > tbody > tr:hover:nth-of-type(odd)+tr{background-color: #b9efea; }
     .dashboard .parent-table.table-hover > tbody > tr:hover:nth-of-type(even) { background: none; }
         .dashboard .parent-table.table-hover > tbody > tr:nth-of-type(even) > td { padding: 15px; border:0; }
-    .dashboard tbody > tr:nth-child(4n+1).isSubPlayer { background: #fcf8e3; }
-    .dashboard tbody > tr:nth-child(4n).isSubPlayer { background: #eae7d2; }
+    .dashboard tbody > tr:nth-child(4n+1).isSubPlayer, .dashboard tbody > tr:nth-of-type(odd).isSubPlayer { background: #b3b3b3; color: #737373; cursor:not-allowed; }
 
     .dashboard .nested-table.table { border-top: 5px solid #fcf8e3; margin:0; }
         .dashboard .nested-table.table > thead > tr > th, .dashboard .nested-table.table > tbody > tr > td { font-size: 11px; padding: 2px; }

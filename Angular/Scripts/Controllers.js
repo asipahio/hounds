@@ -5,6 +5,31 @@ HoundsControllers.controller('DashboardCtrl', ['$scope', "$timeout", "$rootScope
     $scope.LeagueID = null;
     $scope.WeekID = null;
 
+    $scope.ToggleAllDefense = function () {
+        if (_.find($scope.Athletes, { "isDefense": true })) {
+            $scope.CollapseAll();
+        } else {
+            _.each($scope.Athletes, function (ath) {
+                ath.isDefense = !ath.isDefense;
+            });
+        }
+    };
+    $scope.CollapseAll = function () {
+        _.each($scope.Athletes, function (ath) {
+            ath.isDefense = false;
+            ath.isOffense = false;
+        });
+    };
+    $scope.ToggleAllOffense = function () {
+        if (_.find($scope.Athletes, { "isOffense": true })) {
+            $scope.CollapseAll();
+        } else {
+            _.each($scope.Athletes, function (ath) {
+                ath.isOffense = !ath.isOffense;
+            });
+        }
+    };
+
     $scope.Season = SeasonsFactory.LatestSeason;
     SeasonsFactory.GetAllSeasons(function (data) {
         $scope.$apply(function () {
@@ -17,13 +42,16 @@ HoundsControllers.controller('DashboardCtrl', ['$scope', "$timeout", "$rootScope
         });
     });
     $scope.WeeksChanged = function () {
+        if ($scope.LeagueID == null) {
+            $scope.WeekID = null;
+        }
         WeeksFactory.GetAllWeeksBySeason(function (data) {
             $scope.$apply(function () {
                 $scope.Weeks = data;
                 if ($scope.Athletes) {
                     $scope.GetStats();
-                }
-            });
+            }
+        });
         }, $scope.Season.ID, $scope.LeagueID);
     };
 
@@ -45,61 +73,104 @@ HoundsControllers.controller('DashboardCtrl', ['$scope', "$timeout", "$rootScope
         _.each($scope.Athletes, function (data, key) {
             var stats = $scope.Stats[data.ID];
             if ($scope.WeekID !== null && $scope.LeagueID !== null) {
-                stats = _.where(stats, { "WeekID": $scope.WeekID, "LeagueID": $scope.LeagueID });
+                stats = _.where(stats, {
+                    "WeekID": $scope.WeekID, "LeagueID": $scope.LeagueID
+                });
             }
             else if ($scope.WeekID !== null) {
-                stats = _.where(stats, { "WeekID": $scope.WeekID });
+                stats = _.where(stats, {
+                    "WeekID": $scope.WeekID
+                });
             }
             else if ($scope.LeagueID !== null) {
-                stats = _.where(stats, { "LeagueID": $scope.LeagueID });
+                stats = _.where(stats, {
+                    "LeagueID": $scope.LeagueID
+                });
             }
             var defensePoints = 0, offensePoints = 0;
-            $scope.$apply(function () {
-                data.Deflections = _.reduce(stats, function (memo, num) { return memo + num.Deflections; }, 0);
-                data.Interceptions = _.reduce(stats, function (memo, num) { return memo + num.Interceptions; }, 0);
-                data.DefensiveTD = _.reduce(stats, function (memo, num) { return memo + num.DefensiveTD; }, 0);
-                data.FlagPulls = _.reduce(stats, function (memo, num) { return memo + num.FlagPulls; }, 0);
-                data.Sacks = _.reduce(stats, function (memo, num) { return memo + num.Sacks; }, 0);
-                data.Safety = _.reduce(stats, function (memo, num) { return memo + num.Safety; }, 0);
+            data.Deflections = _.reduce(stats, function (memo, num) {
+                return memo + num.Deflections;
+            }, 0);
+            data.Interceptions = _.reduce(stats, function (memo, num) {
+                return memo + num.Interceptions;
+            }, 0);
+            data.DefensiveTD = _.reduce(stats, function (memo, num) {
+                return memo + num.DefensiveTD;
+            }, 0);
+            data.FlagPulls = _.reduce(stats, function (memo, num) {
+                return memo + num.FlagPulls;
+            }, 0);
+            data.Sacks = _.reduce(stats, function (memo, num) {
+                return memo + num.Sacks;
+            }, 0);
+            data.Safety = _.reduce(stats, function (memo, num) {
+                return memo + num.Safety;
+            }, 0);
 
-                defensePoints += data.Deflections * $rootScope.DeflectionCoef;
-                defensePoints += data.Interceptions * $rootScope.InterceptionsCoef;
-                defensePoints += data.DefensiveTD * $rootScope.DefensiveTDCoef;
-                defensePoints += data.FlagPulls * $rootScope.FlagPullsCoef;
-                defensePoints += data.Sacks * $rootScope.SacksCoef;
-                defensePoints += data.Safety * $rootScope.SafetyCoef;
+            defensePoints += data.Deflections * $rootScope.DeflectionCoef;
+            defensePoints += data.Interceptions * $rootScope.InterceptionsCoef;
+            defensePoints += data.DefensiveTD * $rootScope.DefensiveTDCoef;
+            defensePoints += data.FlagPulls * $rootScope.FlagPullsCoef;
+            defensePoints += data.Sacks * $rootScope.SacksCoef;
+            defensePoints += data.Safety * $rootScope.SafetyCoef;
 
-                data.Touchdowns = _.reduce(stats, function (memo, num) { return memo + num.Touchdowns; }, 0);
-                data.PassingTD = _.reduce(stats, function (memo, num) { return memo + num.PassingTD; }, 0);
-                data.ExtraPoints = _.reduce(stats, function (memo, num) { return memo + num.ExtraPoints; }, 0);
-                data.PassingXP = _.reduce(stats, function (memo, num) { return memo + num.PassingXP; }, 0);
-                data.Receptions = _.reduce(stats, function (memo, num) { return memo + num.Receptions; }, 0);
-                data.Rushes = _.reduce(stats, function (memo, num) { return memo + (num.Rushes === undefined ? 0 : num.Rushes); }, 0);
-                data.PassingINT = _.reduce(stats, function (memo, num) { return memo + num.PassingINT; }, 0);
-                data.Rec20Yds = _.reduce(stats, function (memo, num) { return memo + (num.Rec20Yds === undefined ? 0 : num.Rec20Yds); }, 0);
-                data.Rush20Yds = _.reduce(stats, function (memo, num) { return memo + (num.Rush20Yds === undefined ? 0 : num.Rush20Yds); }, 0);
-                data.Pass20Yds = _.reduce(stats, function (memo, num) { return memo + (num.Pass20Yds === undefined ? 0 : num.Pass20Yds); }, 0);
-                data.Drops = _.reduce(stats, function (memo, num) { return memo + (num.Drops === undefined ? 0 : num.Drops); }, 0);
+            data.Touchdowns = _.reduce(stats, function (memo, num) {
+                return memo + num.Touchdowns;
+            }, 0);
+            data.PassingTD = _.reduce(stats, function (memo, num) {
+                return memo + num.PassingTD;
+            }, 0);
+            data.ExtraPoints = _.reduce(stats, function (memo, num) {
+                return memo + num.ExtraPoints;
+            }, 0);
+            data.PassingXP = _.reduce(stats, function (memo, num) {
+                return memo + num.PassingXP;
+            }, 0);
+            data.Receptions = _.reduce(stats, function (memo, num) {
+                return memo + num.Receptions;
+            }, 0);
+            data.Rushes = _.reduce(stats, function (memo, num) {
+                return memo + (num.Rushes === undefined ? 0 : num.Rushes);
+            }, 0);
+            data.PassingINT = _.reduce(stats, function (memo, num) {
+                return memo + num.PassingINT;
+            }, 0);
+            data.Rec20Yds = _.reduce(stats, function (memo, num) {
+                return memo + (num.Rec20Yds === undefined ? 0 : num.Rec20Yds);
+            }, 0);
+            data.Rush20Yds = _.reduce(stats, function (memo, num) {
+                return memo + (num.Rush20Yds === undefined ? 0 : num.Rush20Yds);
+            }, 0);
+            data.Pass20Yds = _.reduce(stats, function (memo, num) {
+                return memo + (num.Pass20Yds === undefined ? 0 : num.Pass20Yds);
+            }, 0);
+            data.Drops = _.reduce(stats, function (memo, num) {
+                return memo + (num.Drops === undefined ? 0 : num.Drops);
+            }, 0);
 
-                offensePoints += data.Touchdowns * $rootScope.TouchdownsCoef;
-                offensePoints += data.PassingTD * $rootScope.PassingTDCoef;
-                offensePoints += data.ExtraPoints * $rootScope.ExtraPointsCoef;
-                offensePoints += data.PassingXP * $rootScope.PassingXPCoef;
-                offensePoints += data.Receptions * $rootScope.ReceptionsCoef;
-                offensePoints += data.Rushes * $rootScope.RushesCoef;
-                offensePoints += data.PassingINT * $rootScope.PassingINTCoef;
-                offensePoints += data.Rec20Yds * $rootScope.Rec20YdsCoef;
-                offensePoints += data.Rush20Yds * $rootScope.Rush20YdsCoef;
-                offensePoints += data.Pass20Yds * $rootScope.Pass20YdsCoef;
-                offensePoints += data.Drops * $rootScope.DropsCoef;
-                data.DefensivePoints = defensePoints;
-                data.OffensivePoints = offensePoints;
-                data.TotalPoints = offensePoints + defensePoints;
-                data.GP = stats === undefined ? 0 : stats.length;
-                data.AthleteID = key;
-                data.DGB = _.where($scope.Weeks, { "DGB": data.ID }).length;
-                data.OGB = _.where($scope.Weeks, { "OGB": data.ID }).length;
-            });
+            offensePoints += data.Touchdowns * $rootScope.TouchdownsCoef;
+            offensePoints += data.PassingTD * $rootScope.PassingTDCoef;
+            offensePoints += data.ExtraPoints * $rootScope.ExtraPointsCoef;
+            offensePoints += data.PassingXP * $rootScope.PassingXPCoef;
+            offensePoints += data.Receptions * $rootScope.ReceptionsCoef;
+            offensePoints += data.Rushes * $rootScope.RushesCoef;
+            offensePoints += data.PassingINT * $rootScope.PassingINTCoef;
+            offensePoints += data.Rec20Yds * $rootScope.Rec20YdsCoef;
+            offensePoints += data.Rush20Yds * $rootScope.Rush20YdsCoef;
+            offensePoints += data.Pass20Yds * $rootScope.Pass20YdsCoef;
+            offensePoints += data.Drops * $rootScope.DropsCoef;
+            data.DefensivePoints = defensePoints;
+            data.OffensivePoints = offensePoints;
+            data.TotalPoints = offensePoints + defensePoints;
+            data.GP = stats === undefined ? 0 : stats.length;
+            data.AthleteID = key;
+            data.DGB = _.where($scope.Weeks, {
+                "DGB": data.ID
+            }).length;
+            data.OGB = _.where($scope.Weeks, {
+                "OGB": data.ID
+            }).length;
+            $timeout(function(){ $scope.$apply();},0);
         });
     };
 
