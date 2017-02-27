@@ -52,6 +52,7 @@
                                 <th data-ng-show="ath.isDefense">Flag Pulls</th>
                                 <th data-ng-show="ath.isDefense">Sacks</th>
                                 <th data-ng-show="ath.isDefense">Safety</th>
+                                <th data-ng-show="ath.isDefense">Penalty</th>
                                 <th data-ng-show="(isDefense && isOffense) || (ath.isDefense && ath.isOffense)" class="separator"></th>
                                 <th data-ng-show="ath.isOffense">TD</th>
                                 <th data-ng-show="ath.isOffense">Pass. TD</th>
@@ -74,6 +75,7 @@
                                 <td data-ng-show="ath.isDefense">{{ ath.FlagPulls }}</td>
                                 <td data-ng-show="ath.isDefense">{{ ath.Sacks }}</td>
                                 <td data-ng-show="ath.isDefense">{{ ath.Safety }}</td>
+                                <td data-ng-show="ath.isDefense">{{ ath.Penalty }}</td>
                                 <td data-ng-show="(isDefense && isOffense) || (ath.isDefense && ath.isOffense)" class="separator"></td>
                                 <td data-ng-show="ath.isOffense">{{ ath.Touchdowns }}</td>
                                 <td data-ng-show="ath.isOffense">{{ ath.PassingTD }}</td>

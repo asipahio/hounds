@@ -42,7 +42,7 @@ HoundsControllers.controller('DashboardCtrl', ['$scope', "$timeout", "$rootScope
         });
     });
     $scope.WeeksChanged = function () {
-        if ($scope.LeagueID == null) {
+        if ($scope.LeagueID === null) {
             $scope.WeekID = null;
         }
         WeeksFactory.GetAllWeeksBySeason(function (data) {
@@ -106,6 +106,9 @@ HoundsControllers.controller('DashboardCtrl', ['$scope', "$timeout", "$rootScope
             data.Safety = _.reduce(stats, function (memo, num) {
                 return memo + num.Safety;
             }, 0);
+            data.Penalty = _.reduce(stats, function (memo, num) {
+                return memo + (num.Penalty === undefined ? 0 : num.Penalty);
+            }, 0);
 
             defensePoints += data.Deflections * $rootScope.DeflectionCoef;
             defensePoints += data.Interceptions * $rootScope.InterceptionsCoef;
@@ -113,6 +116,7 @@ HoundsControllers.controller('DashboardCtrl', ['$scope', "$timeout", "$rootScope
             defensePoints += data.FlagPulls * $rootScope.FlagPullsCoef;
             defensePoints += data.Sacks * $rootScope.SacksCoef;
             defensePoints += data.Safety * $rootScope.SafetyCoef;
+            defensePoints += data.Penalty * $rootScope.PenaltyCoef;
 
             data.Touchdowns = _.reduce(stats, function (memo, num) {
                 return memo + num.Touchdowns;
