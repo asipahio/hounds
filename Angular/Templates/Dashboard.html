@@ -23,8 +23,8 @@
         <thead>
             <tr>
                 <th data-ng-click="orderClause='Name';reverse=!reverse">Name</th>
-                <th><span data-ng-click="orderClause='DefensivePoints';reverse=!reverse">Defensive Points</span> <a data-ng-click="ToggleAllDefense()"><i class="fa fa-bar-chart"></i></a></th>
-                <th><span data-ng-click="orderClause='OffensivePoints';reverse=!reverse">Offensive Points</span> <a data-ng-click="ToggleAllOffense()"><i class="fa fa-bar-chart"></i></a></th>
+                <th><span data-ng-click="orderClause='DefensivePoints';reverse=!reverse">Defensive Points / week</span> <a data-ng-click="ToggleAllDefense()"><i class="fa fa-bar-chart"></i></a></th>
+                <th><span data-ng-click="orderClause='OffensivePoints';reverse=!reverse">Offensive Points / week</span> <a data-ng-click="ToggleAllOffense()"><i class="fa fa-bar-chart"></i></a></th>
                 <th data-ng-click="orderClause='TotalPoints';reverse=!reverse">Total Points</th>
                 <th data-ng-click="orderClause='DGB';reverse=!reverse">DGB</th>
                 <th data-ng-click="orderClause='OGB';reverse=!reverse">OGB</th>
@@ -34,8 +34,8 @@
         <tbody>
             <tr data-ng-repeat-start="ath in Athletes | orderBy:orderClause:reverse" data-ng-class="{'isSubPlayer' : !ath.IsRegularPlayer}">
                 <th>{{ ath.Name }}</th>
-                <td><input type="checkbox" data-ng-model="ath.isDefense" /> {{ ath.DefensivePoints }}</td>
-                <td><input type="checkbox" data-ng-model="ath.isOffense" /> {{ ath.OffensivePoints }}</td>
+                <td><input type="checkbox" data-ng-model="ath.isDefense" /> {{ ath.DefensivePointsW }} ({{ ath.DefensivePoints }})</td>
+                <td><input type="checkbox" data-ng-model="ath.isOffense" /> {{ ath.OffensivePointsW }} ({{ ath.OffensivePoints }})</td>
                 <td><a data-ng-click="ath.isOffense = !ath.isOffense; ath.isDefense = !ath.isDefense"><i class="fa fa-bar-chart"></i></a> {{ ath.TotalPoints }}</td>
                 <td>{{ ath.DGB }}</td>
                 <td>{{ ath.OGB }}</td>

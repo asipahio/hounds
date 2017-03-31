@@ -163,10 +163,14 @@ HoundsControllers.controller('DashboardCtrl', ['$scope', "$timeout", "$rootScope
             offensePoints += data.Rush20Yds * $rootScope.Rush20YdsCoef;
             offensePoints += data.Pass20Yds * $rootScope.Pass20YdsCoef;
             offensePoints += data.Drops * $rootScope.DropsCoef;
+            
+            data.GP = stats === undefined ? 0 : stats.length;
             data.DefensivePoints = defensePoints;
             data.OffensivePoints = offensePoints;
-            data.TotalPoints = offensePoints + defensePoints;
-            data.GP = stats === undefined ? 0 : stats.length;
+            data.DefensivePointsW = Math.round(defensePoints / data.GP * 100) / 100;
+            data.OffensivePointsW = Math.round(offensePoints / data.GP * 100) / 100;
+            data.TotalPoints = data.DefensivePointsW + data.OffensivePointsW;
+
             data.AthleteID = key;
             data.DGB = _.where($scope.Weeks, {
                 "DGB": data.ID
