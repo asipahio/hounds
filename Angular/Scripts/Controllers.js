@@ -163,10 +163,14 @@ HoundsControllers.controller('DashboardCtrl', ['$scope', "$timeout", "$rootScope
             offensePoints += data.Rush20Yds * $rootScope.Rush20YdsCoef;
             offensePoints += data.Pass20Yds * $rootScope.Pass20YdsCoef;
             offensePoints += data.Drops * $rootScope.DropsCoef;
+            
+            data.GP = stats === undefined ? 0 : stats.length;
             data.DefensivePoints = defensePoints;
             data.OffensivePoints = offensePoints;
-            data.TotalPoints = offensePoints + defensePoints;
-            data.GP = stats === undefined ? 0 : stats.length;
+            data.DefensivePointsW = Math.round(defensePoints / data.GP * 100) / 100;
+            data.OffensivePointsW = Math.round(offensePoints / data.GP * 100) / 100;
+            data.TotalPoints = data.DefensivePointsW + data.OffensivePointsW;
+
             data.AthleteID = key;
             data.DGB = _.where($scope.Weeks, {
                 "DGB": data.ID
@@ -362,22 +366,22 @@ HoundsControllers.controller('WeeksCtrl', ['$scope', "$routeParams", "$rootScope
                     });
                 }
                 data.stats = totalStats;
-                data.stats.DefensivePoints = (data.stats.Deflections * $rootScope.DeflectionCoef) +
-                                             (data.stats.Interceptions * $rootScope.InterceptionsCoef) +
-                                             (data.stats.DefensiveTD * $rootScope.DefensiveTDCoef) +
-                                             (data.stats.FlagPulls * $rootScope.FlagPullsCoef) +
-                                             (data.stats.Sacks * $rootScope.SacksCoef) +
-                                             (data.stats.Safety * $rootScope.SafetyCoef);
+                data.stats.DefensivePoints = data.stats.Deflections * $rootScope.DeflectionCoef +
+                                             data.stats.Interceptions * $rootScope.InterceptionsCoef +
+                                             data.stats.DefensiveTD * $rootScope.DefensiveTDCoef +
+                                             data.stats.FlagPulls * $rootScope.FlagPullsCoef +
+                                             data.stats.Sacks * $rootScope.SacksCoef +
+                                             data.stats.Safety * $rootScope.SafetyCoef;
                 data.stats.DefensivePoints = Math.round(data.stats.DefensivePoints / stats[data.ID].length * 100) / 100;
-                data.stats.OffensivePoints = (data.stats.Touchdowns * $rootScope.TouchdownsCoef) +
-                                             (data.stats.PassingTD * $rootScope.PassingTDCoef) +
-                                             (data.stats.ExtraPoints * $rootScope.ExtraPointsCoef) +
-                                             (data.stats.PassingXP * $rootScope.PassingXPCoef) +
-                                             (data.stats.Receptions * $rootScope.ReceptionsCoef) +
-                                             (data.stats.PassingINT * $rootScope.PassingINTCoef) + 
-                                             (data.stats.Rec20Yds * $rootScope.Rec20YdsCoef) + 
-                                             (data.stats.Drops * $rootScope.DropsCoef) +
-                                             (data.stats.Pass20Yds * $rootScope.Pass20YdsCoef);
+                data.stats.OffensivePoints = data.stats.Touchdowns * $rootScope.TouchdownsCoef +
+                                             data.stats.PassingTD * $rootScope.PassingTDCoef +
+                                             data.stats.ExtraPoints * $rootScope.ExtraPointsCoef +
+                                             data.stats.PassingXP * $rootScope.PassingXPCoef +
+                                             data.stats.Receptions * $rootScope.ReceptionsCoef +
+                                             data.stats.PassingINT * $rootScope.PassingINTCoef +
+                                             data.stats.Rec20Yds * $rootScope.Rec20YdsCoef +
+                                             data.stats.Drops * $rootScope.DropsCoef +
+                                             data.stats.Pass20Yds * $rootScope.Pass20YdsCoef;
                 data.stats.OffensivePoints = Math.round(data.stats.OffensivePoints / stats[data.ID].length * 100) / 100;
                 data.stats.TotalPoints = data.stats.DefensivePoints + data.stats.OffensivePoints;
                 data.isDNP = data.stats === undefined;
@@ -391,35 +395,35 @@ HoundsControllers.controller('WeeksCtrl', ['$scope', "$routeParams", "$rootScope
                 $scope.Athletes = UIAthletes;
                 $scope.gridOptions.data = UIAthletes;
             });
-        }, $routeParams.SeasonID, $routeParams.LeagueID)
+        }, $routeParams.SeasonID, $routeParams.LeagueID);
     });
 
-    var rowtpl = '<div ng-class="{ \'isSubPlayer\':!row.entity.IsRegularPlayer }"><div ng-repeat="(colRenderIndex, col) in colContainer.renderedColumns track by col.colDef.name" class="ui-grid-cell" ng-class="{ \'ui-grid-row-header-cell\': col.isRowHeader }" ui-grid-cell></div></div>'
+    var rowtpl = '<div ng-class="{ \'isSubPlayer\':!row.entity.IsRegularPlayer }"><div ng-repeat="(colRenderIndex, col) in colContainer.renderedColumns track by col.colDef.name" class="ui-grid-cell" ng-class="{ \'ui-grid-row-header-cell\': col.isRowHeader }" ui-grid-cell></div></div>';
     $scope.gridOptions = {
         rowTemplate: rowtpl,
         columnDefs: [
             { name: 'Name', width: 75, pinnedLeft: true },
-            { name: 'stats.DefensivePoints', displayName: "Def. Pts", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return "fantasy" } },
-            { name: 'stats.OffensivePoints', displayName: "Off. Pts", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return "fantasy" } },
-            { name: 'stats.TotalPoints', sort: { direction: uiGridConstants.DESC, priority: 1 }, displayName: "Tot. Pts", width: 75, type: 'number', cellClass: function (grid, row, col) { return "fantasy" } },
+            { name: 'stats.DefensivePoints', displayName: "Def. Pts", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return "fantasy"; } },
+            { name: 'stats.OffensivePoints', displayName: "Off. Pts", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return "fantasy"; } },
+            { name: 'stats.TotalPoints', sort: { direction: uiGridConstants.DESC, priority: 1 }, displayName: "Tot. Pts", width: 75, type: 'number', cellClass: function (grid, row, col) { return "fantasy"; } },
             { name: 'stats.Deflections', displayName: "Defl.", width: 75, category: "Defense", type: 'number' },
-            { name: 'stats.Interceptions', displayName: "Int", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Interceptions === $scope.MaxInterceptions ? "maxColValue" : "" } },
-            { name: 'stats.DefensiveTD', displayName: "Def. TD", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.DefensiveTD === $scope.MaxDefensiveTD ? "maxColValue" : "" } },
-            { name: 'stats.FlagPulls', displayName: "Flag Pulls", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.FlagPulls === $scope.MaxFlagPulls ? "maxColValue" : "" } },
-            { name: 'stats.Sacks', displayName: "Sacks", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Sacks === $scope.MaxSacks ? "maxColValue" : "" } },
-            { name: 'stats.Safety', displayName: "Safeties", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Safety === $scope.MaxSafety ? "maxColValue" : "" } },
-            { name: 'stats.Touchdowns', displayName: "TD", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Touchdowns === $scope.MaxTouchdowns ? "maxColValue" : "" } },
-            { name: 'stats.PassingTD', displayName: "Pass. TD", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingTD === $scope.MaxPassingTD ? "maxColValue" : "" } },
-            { name: 'stats.ExtraPoints', displayName: "XP", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.ExtraPoints === $scope.MaxExtraPoints ? "maxColValue" : "" } },
-            { name: 'stats.PassingXP', displayName: "Pass. XP", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingXP === $scope.MaxPassingXP ? "maxColValue" : "" } },
-            { name: 'stats.Receptions', displayName: "Rec.", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Receptions === $scope.MaxReceptions ? "maxColValue" : "" } },
-            { name: 'stats.PassingINT', displayName: "Pass. INT", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingINT === $scope.MaxPassingINT ? "maxColValue" : "" } },
-            { name: 'stats.Rec20Yds', displayName: "Rec. 20+ yds", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Rec20Yds === $scope.MaxRec20Yds ? "maxColValue" : "" } },
-            { name: 'stats.Pass20Yds', displayName: "Pass. 20+ yds", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Pass20Yds === $scope.MaxPass20Yds ? "maxColValue" : "" } },
-            { name: 'stats.Drops', displayName: "Drops", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Drops === $scope.MaxDrops ? "maxColValue" : "" } }
+            { name: 'stats.Interceptions', displayName: "Int", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Interceptions === $scope.MaxInterceptions ? "maxColValue" : ""; } },
+            { name: 'stats.DefensiveTD', displayName: "Def. TD", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.DefensiveTD === $scope.MaxDefensiveTD ? "maxColValue" : ""; } },
+            { name: 'stats.FlagPulls', displayName: "Flag Pulls", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.FlagPulls === $scope.MaxFlagPulls ? "maxColValue" : ""; } },
+            { name: 'stats.Sacks', displayName: "Sacks", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Sacks === $scope.MaxSacks ? "maxColValue" : ""; } },
+            { name: 'stats.Safety', displayName: "Safeties", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Safety === $scope.MaxSafety ? "maxColValue" : ""; } },
+            { name: 'stats.Touchdowns', displayName: "TD", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Touchdowns === $scope.MaxTouchdowns ? "maxColValue" : ""; } },
+            { name: 'stats.PassingTD', displayName: "Pass. TD", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingTD === $scope.MaxPassingTD ? "maxColValue" : ""; } },
+            { name: 'stats.ExtraPoints', displayName: "XP", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.ExtraPoints === $scope.MaxExtraPoints ? "maxColValue" : ""; } },
+            { name: 'stats.PassingXP', displayName: "Pass. XP", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingXP === $scope.MaxPassingXP ? "maxColValue" : ""; } },
+            { name: 'stats.Receptions', displayName: "Rec.", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Receptions === $scope.MaxReceptions ? "maxColValue" : ""; } },
+            { name: 'stats.PassingINT', displayName: "Pass. INT", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingINT === $scope.MaxPassingINT ? "maxColValue" : ""; } },
+            { name: 'stats.Rec20Yds', displayName: "Rec. 20+ yds", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Rec20Yds === $scope.MaxRec20Yds ? "maxColValue" : ""; } },
+            { name: 'stats.Pass20Yds', displayName: "Pass. 20+ yds", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Pass20Yds === $scope.MaxPass20Yds ? "maxColValue" : ""; } },
+            { name: 'stats.Drops', displayName: "Drops", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Drops === $scope.MaxDrops ? "maxColValue" : ""; } }
         ]
     };
-}])
+}]);
 
 HoundsControllers.controller('StatsCtrl', ['$scope', "$routeParams", "$rootScope", "StatsFactory", "AthleteFactory", "WeeksFactory", "uiGridConstants", function ($scope, $routeParams, $rootScope, StatsFactory, AthleteFactory, WeeksFactory, uiGridConstants) {
     AthleteFactory.GetAthletes(function (athletes) {
@@ -429,28 +433,28 @@ HoundsControllers.controller('StatsCtrl', ['$scope', "$routeParams", "$rootScope
                 data.stats = _.findWhere(stats, { "AthleteID": data.ID });
                 data.isDNP = data.stats === undefined;
                 if (data.isDNP) {
-                    data.stats = { Deflections: 0, DefensiveTD: 0, Interceptions: 0, FlagPulls: 0, Sacks: 0, Safety: 0, Touchdowns: 0, PassingTD: 0, ExtraPoints: 0, PassingXP: 0, Receptions: 0, PassingINT: 0, Pass20Yds: 0, Rec20Yds: 0, Drops:0 };
+                    data.stats = { Deflections: 0, DefensiveTD: 0, Interceptions: 0, FlagPulls: 0, Sacks: 0, Safety: 0, Touchdowns: 0, PassingTD: 0, ExtraPoints: 0, PassingXP: 0, Receptions: 0, PassingINT: 0, Pass20Yds: 0, Rec20Yds: 0, Drops: 0 };
                 }
 
                 data.stats.Rec20Yds = data.stats.Rec20Yds === undefined ? 0 : data.stats.Rec20Yds;
                 data.stats.Pass20Yds = data.stats.Pass20Yds === undefined ? 0 : data.stats.Pass20Yds;
                 data.stats.Drops = data.stats.Drops === undefined ? 0 : data.stats.Drops;
 
-                data.stats.DefensivePoints = (data.stats.Deflections * $rootScope.DeflectionCoef) +
-                                             (data.stats.Interceptions * $rootScope.InterceptionsCoef) +
-                                             (data.stats.DefensiveTD * $rootScope.DefensiveTDCoef) +
-                                             (data.stats.FlagPulls * $rootScope.FlagPullsCoef) +
-                                             (data.stats.Sacks * $rootScope.SacksCoef) +
-                                             (data.stats.Safety * $rootScope.SafetyCoef);
-                data.stats.OffensivePoints = (data.stats.Touchdowns * $rootScope.TouchdownsCoef) +
-                                             (data.stats.PassingTD * $rootScope.PassingTDCoef) +
-                                             (data.stats.ExtraPoints * $rootScope.ExtraPointsCoef) +
-                                             (data.stats.PassingXP * $rootScope.PassingXPCoef) +
-                                             (data.stats.Receptions * $rootScope.ReceptionsCoef) +
-                                             (data.stats.PassingINT * $rootScope.PassingINTCoef) +
-                                             (data.stats.Rec20Yds * $rootScope.Rec20YdsCoef) +
-                                             (data.stats.Pass20Yds * $rootScope.Pass20YdsCoef) +
-                                             (data.stats.Drops * $rootScope.DropsCoef);
+                data.stats.DefensivePoints = data.stats.Deflections * $rootScope.DeflectionCoef +
+                                             data.stats.Interceptions * $rootScope.InterceptionsCoef +
+                                             data.stats.DefensiveTD * $rootScope.DefensiveTDCoef +
+                                             data.stats.FlagPulls * $rootScope.FlagPullsCoef +
+                                             data.stats.Sacks * $rootScope.SacksCoef +
+                                             data.stats.Safety * $rootScope.SafetyCoef;
+                data.stats.OffensivePoints = data.stats.Touchdowns * $rootScope.TouchdownsCoef +
+                                             data.stats.PassingTD * $rootScope.PassingTDCoef +
+                                             data.stats.ExtraPoints * $rootScope.ExtraPointsCoef +
+                                             data.stats.PassingXP * $rootScope.PassingXPCoef +
+                                             data.stats.Receptions * $rootScope.ReceptionsCoef +
+                                             data.stats.PassingINT * $rootScope.PassingINTCoef +
+                                             data.stats.Rec20Yds * $rootScope.Rec20YdsCoef +
+                                             data.stats.Pass20Yds * $rootScope.Pass20YdsCoef +
+                                             data.stats.Drops * $rootScope.DropsCoef;
                 data.stats.TotalPoints = data.stats.DefensivePoints + data.stats.OffensivePoints;
                 data.AthleteID = key;
                 if (data.isDNP && !data.IsRegularPlayer) {
@@ -462,7 +466,7 @@ HoundsControllers.controller('StatsCtrl', ['$scope', "$routeParams", "$rootScope
                 $scope.Athletes = UIAthletes;
                 $scope.gridOptions.data = UIAthletes;
             });
-        }, $routeParams.SeasonID, $routeParams.LeagueID, $routeParams.WeekID)
+        }, $routeParams.SeasonID, $routeParams.LeagueID, $routeParams.WeekID);
 
         WeeksFactory.GetWeekDetails(function (data) {
             $scope.$apply(function () {
@@ -478,27 +482,27 @@ HoundsControllers.controller('StatsCtrl', ['$scope', "$routeParams", "$rootScope
         rowTemplate: rowtpl,
         columnDefs: [
             { name: 'Name', width: 75, pinnedLeft: true },
-            { name: 'stats.DefensivePoints', displayName: "Def. Pts", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return "fantasy" } },
-            { name: 'stats.OffensivePoints', displayName: "Off. Pts", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return "fantasy" } },
-            { name: 'stats.TotalPoints', sort: { direction: uiGridConstants.DESC, priority: 1 }, displayName: "Tot. Pts", width: 75, type: 'number', cellClass: function (grid, row, col) { return "fantasy" } },
+            { name: 'stats.DefensivePoints', displayName: "Def. Pts", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return "fantasy"; } },
+            { name: 'stats.OffensivePoints', displayName: "Off. Pts", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return "fantasy"; } },
+            { name: 'stats.TotalPoints', sort: { direction: uiGridConstants.DESC, priority: 1 }, displayName: "Tot. Pts", width: 75, type: 'number', cellClass: function (grid, row, col) { return "fantasy"; } },
             { name: 'stats.Deflections', displayName: "Defl.", width: 75, category: "Defense", type: 'number' },
-            { name: 'stats.Interceptions', displayName: "Int", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Interceptions === $scope.MaxInterceptions ? "maxColValue" : "" } },
-            { name: 'stats.DefensiveTD', displayName: "Def. TD", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.DefensiveTD === $scope.MaxDefensiveTD ? "maxColValue" : "" } },
-            { name: 'stats.FlagPulls', displayName: "Flag Pulls", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.FlagPulls === $scope.MaxFlagPulls ? "maxColValue" : "" } },
-            { name: 'stats.Sacks', displayName: "Sacks", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Sacks === $scope.MaxSacks ? "maxColValue" : "" } },
-            { name: 'stats.Safety', displayName: "Safeties", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Safety === $scope.MaxSafety ? "maxColValue" : "" } },
-            { name: 'stats.Touchdowns', displayName: "TD", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Touchdowns === $scope.MaxTouchdowns ? "maxColValue" : "" } },
-            { name: 'stats.PassingTD', displayName: "Pass. TD", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingTD === $scope.MaxPassingTD ? "maxColValue" : "" } },
-            { name: 'stats.ExtraPoints', displayName: "XP", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.ExtraPoints === $scope.MaxExtraPoints ? "maxColValue" : "" } },
-            { name: 'stats.PassingXP', displayName: "Pass. XP", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingXP === $scope.MaxPassingXP ? "maxColValue" : "" } },
-            { name: 'stats.Receptions', displayName: "Rec.", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Receptions === $scope.MaxReceptions ? "maxColValue" : "" } },
-            { name: 'stats.PassingINT', displayName: "Pass. INT", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingINT === $scope.MaxPassingINT ? "maxColValue" : "" } },
-            { name: 'stats.Rec20Yds', displayName: "Rec. 20+ Yds", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Rec20Yds === $scope.MaxRec20Yds ? "maxColValue" : "" } },
-            { name: 'stats.Pass20Yds', displayName: "Pass. 20+ Yds", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Pass20Yds === $scope.MaxPass20Yds ? "maxColValue" : "" } },
-            { name: 'stats.Drops', displayName: "Drops", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Drops === $scope.MaxDrops ? "maxColValue" : "" } }
+            { name: 'stats.Interceptions', displayName: "Int", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Interceptions === $scope.MaxInterceptions ? "maxColValue" : ""; } },
+            { name: 'stats.DefensiveTD', displayName: "Def. TD", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.DefensiveTD === $scope.MaxDefensiveTD ? "maxColValue" : ""; } },
+            { name: 'stats.FlagPulls', displayName: "Flag Pulls", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.FlagPulls === $scope.MaxFlagPulls ? "maxColValue" : ""; } },
+            { name: 'stats.Sacks', displayName: "Sacks", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Sacks === $scope.MaxSacks ? "maxColValue" : ""; } },
+            { name: 'stats.Safety', displayName: "Safeties", width: 75, category: "Defense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Safety === $scope.MaxSafety ? "maxColValue" : ""; } },
+            { name: 'stats.Touchdowns', displayName: "TD", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Touchdowns === $scope.MaxTouchdowns ? "maxColValue" : ""; } },
+            { name: 'stats.PassingTD', displayName: "Pass. TD", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingTD === $scope.MaxPassingTD ? "maxColValue" : ""; } },
+            { name: 'stats.ExtraPoints', displayName: "XP", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.ExtraPoints === $scope.MaxExtraPoints ? "maxColValue" : ""; } },
+            { name: 'stats.PassingXP', displayName: "Pass. XP", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingXP === $scope.MaxPassingXP ? "maxColValue" : ""; } },
+            { name: 'stats.Receptions', displayName: "Rec.", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Receptions === $scope.MaxReceptions ? "maxColValue" : ""; } },
+            { name: 'stats.PassingINT', displayName: "Pass. INT", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.PassingINT === $scope.MaxPassingINT ? "maxColValue" : ""; } },
+            { name: 'stats.Rec20Yds', displayName: "Rec. 20+ Yds", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Rec20Yds === $scope.MaxRec20Yds ? "maxColValue" : ""; } },
+            { name: 'stats.Pass20Yds', displayName: "Pass. 20+ Yds", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Pass20Yds === $scope.MaxPass20Yds ? "maxColValue" : ""; } },
+            { name: 'stats.Drops', displayName: "Drops", width: 75, category: "Offense", type: 'number', cellClass: function (grid, row, col) { return row.entity.stats.Drops === $scope.MaxDrops ? "maxColValue" : ""; } }
         ]
     };
-}])
+}]);
 
 HoundsControllers.controller('UpdateCtrl', ['$scope', "$routeParams", "$location", "LeagueFactory", "AthleteFactory", "WeeksFactory", "StatsFactory", function ($scope, $routeParams, $location, LeagueFactory, AthleteFactory, WeeksFactory, StatsFactory) {
     LeagueFactory.GetAllLeagues(function (data) {
@@ -527,7 +531,7 @@ HoundsControllers.controller('UpdateCtrl', ['$scope', "$routeParams", "$location
                 $scope.$apply(function () {
                     $scope.Athletes = UIAthletes;
                 });
-            }, Week.SeasonID, $scope.LeagueID, Week.ID)
+            }, Week.SeasonID, $scope.LeagueID, Week.ID);
         });
     };
 
@@ -538,7 +542,7 @@ HoundsControllers.controller('UpdateCtrl', ['$scope', "$routeParams", "$location
             });
         }, Week.SeasonID, LeagueID, Week.ID, Athlete);
     };
-}])
+}]);
 
 
 HoundsControllers.controller('UpdateWeeksCtrl', ['$scope', "$routeParams", "LeagueFactory", "$location", "WeeksFactory", "SeasonsFactory", function ($scope, $routeParams, LeagueFactory, $location, WeeksFactory, SeasonsFactory) {
@@ -559,7 +563,7 @@ HoundsControllers.controller('UpdateWeeksCtrl', ['$scope', "$routeParams", "Leag
             $scope.$apply(function () {
                 $location.path("/Stats/" + $scope.SeasonID + "/" + $scope.LeagueID + "/" + WeekID);
             });
-        }, $scope.SeasonID, $scope.LeagueID, $scope.OGB, $scope.DGB, $scope.Week)
-    }
+        }, $scope.SeasonID, $scope.LeagueID, $scope.OGB, $scope.DGB, $scope.Week);
+    };
 }])
 ;
