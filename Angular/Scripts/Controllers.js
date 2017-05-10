@@ -167,8 +167,13 @@ HoundsControllers.controller('DashboardCtrl', ['$scope', "$timeout", "$rootScope
             data.GP = stats === undefined ? 0 : stats.length;
             data.DefensivePoints = defensePoints;
             data.OffensivePoints = offensePoints;
-            data.DefensivePointsW = Math.round(defensePoints / data.GP * 100) / 100;
-            data.OffensivePointsW = Math.round(offensePoints / data.GP * 100) / 100;
+            if (data.GP == 0) {
+                data.DefensivePointsW = 0;
+                data.OffensivePointsW = 0;
+            } else {
+                data.DefensivePointsW = Math.round(defensePoints / data.GP * 100) / 100;
+                data.OffensivePointsW = Math.round(offensePoints / data.GP * 100) / 100;
+            }
             data.TotalPoints = Math.round((data.DefensivePointsW + data.OffensivePointsW) * 100) / 100;
 
             data.AthleteID = key;
