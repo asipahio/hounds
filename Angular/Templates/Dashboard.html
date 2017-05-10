@@ -32,7 +32,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr data-ng-repeat-start="ath in Athletes | orderBy:orderClause:reverse" data-ng-class="{'isSubPlayer' : !ath.IsRegularPlayer}">
+            <tr data-ng-repeat-start="ath in Athletes | orderBy:orderClause:reverse" data-ng-class="{'isSubPlayer' : !ath.IsRegularPlayer}" data-ng-hide="ath.GP == 0">
                 <th>{{ ath.Name }}</th>
                 <td><input type="checkbox" data-ng-model="ath.isDefense" /> {{ ath.DefensivePointsW }} ({{ ath.DefensivePoints }})</td>
                 <td><input type="checkbox" data-ng-model="ath.isOffense" /> {{ ath.OffensivePointsW }} ({{ ath.OffensivePoints }})</td>
